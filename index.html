@@ -30,7 +30,7 @@ body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;fo
 .ca-bl{bottom:0;left:0;border-width:0 0 1px 1px;}
 .ca-br{bottom:0;right:0;border-width:0 1px 1px 0;}
 .hud-lbl{font-size:9px;letter-spacing:.2em;color:var(--text-dim);text-transform:uppercase;margin-bottom:14px;font-family:'Share Tech Mono',monospace;}
-.hud-stats{display:grid;grid-template-columns:auto 1fr auto auto auto auto;align-items:center;gap:0 14px;}
+.hud-stats{display:grid;grid-template-columns:auto 1fr auto auto auto auto auto;align-items:center;gap:0 14px;}
 .rank-badge{width:54px;height:54px;border:2px solid var(--purple);border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(124,92,191,.08);}
 .rank-lbl{font-size:9px;color:var(--text-dim);letter-spacing:.1em;}
 .rank-val{font-size:28px;font-weight:600;color:var(--purple-light);line-height:1;}
@@ -49,6 +49,7 @@ body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;fo
 .sp-lbl{font-size:9px;color:var(--text-dim);letter-spacing:.08em;text-transform:uppercase;}
 .sp-val{font-size:18px;font-weight:600;line-height:1;font-family:'Share Tech Mono',monospace;}
 .sp-unit{font-size:9px;color:var(--text-dim);}
+.streak-warn{margin-top:9px;font-size:10px;color:var(--amber);font-family:'Share Tech Mono',monospace;letter-spacing:.08em;display:none;}
 .shift-card{background:var(--surface);border:1px solid var(--border);border-top:2px solid var(--amber);border-radius:4px;padding:16px 20px;}
 .shift-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
 .shift-title{font-size:9px;letter-spacing:.2em;color:var(--text-dim);text-transform:uppercase;font-family:'Share Tech Mono',monospace;}
@@ -99,6 +100,23 @@ body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;fo
 .dxp-track{flex:1;height:4px;background:var(--border);border-radius:2px;overflow:hidden;}
 .dxp-fill{height:100%;background:var(--blue);border-radius:2px;transition:width .4s ease;}
 .dxp-val{font-size:10px;font-family:'Share Tech Mono',monospace;color:var(--blue);white-space:nowrap;}
+.debrief-panel{background:var(--surface);border:1px solid var(--border);border-top:2px solid var(--purple);border-radius:4px;padding:18px 20px;}
+.debrief-lbl{font-size:9px;letter-spacing:.2em;color:var(--text-dim);text-transform:uppercase;margin-bottom:14px;font-family:'Share Tech Mono',monospace;}
+.debrief-fields{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px;}
+.debrief-field{display:flex;flex-direction:column;gap:5px;}
+.debrief-field label{font-size:9px;color:var(--text-dim);letter-spacing:.1em;text-transform:uppercase;font-family:'Share Tech Mono',monospace;}
+.debrief-field textarea{background:var(--surface2);border:1px solid var(--border-glow);border-radius:3px;padding:8px 9px;color:var(--text);font-family:'Share Tech Mono',monospace;font-size:12px;outline:none;resize:vertical;min-height:72px;line-height:1.4;}
+.debrief-field textarea:focus{border-color:var(--purple);}
+.debrief-save-row{display:flex;align-items:center;gap:10px;}
+.debrief-btn{background:var(--purple);color:#fff;border:none;border-radius:3px;padding:7px 18px;font-family:'Share Tech Mono',monospace;font-size:10px;cursor:pointer;letter-spacing:.1em;text-transform:uppercase;}
+.debrief-btn:hover{background:var(--purple-light);color:#000;}
+.debrief-saved-note{font-size:10px;color:var(--green);font-family:'Share Tech Mono',monospace;opacity:0;transition:opacity .3s;}
+.debrief-history{background:var(--surface);border:1px solid var(--border);border-top:2px solid var(--border-glow);border-radius:4px;overflow:hidden;}
+.dh-scroll{max-height:240px;overflow-y:auto;}
+.dh-table{width:100%;border-collapse:collapse;table-layout:fixed;}
+.dh-table th{padding:6px 10px;text-align:left;font-size:9px;letter-spacing:.08em;color:var(--text-dim);text-transform:uppercase;border-bottom:1px solid var(--border);font-weight:500;white-space:nowrap;position:sticky;top:0;background:var(--surface);}
+.dh-table td{padding:7px 10px;border-bottom:1px solid rgba(30,30,53,.5);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.dh-table tr:last-child td{border-bottom:none;}
 .logs-top{margin-bottom:10px;}
 .logs-bottom{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;}
 .logp{background:var(--surface);border:1px solid var(--border);border-radius:4px;overflow:hidden;}
@@ -157,10 +175,12 @@ td.in{color:var(--green);}td.out{color:var(--red);}td.pl{color:var(--purple-ligh
       <div class="edit-xp"><label>TOTAL XP:</label><input type="number" id="xp-input" value="0" min="0" max="99999"/><button onclick="saveXP()">SET XP</button></div>
     </div>
     <div class="stat-pill"><span class="sp-lbl">streak</span><span class="sp-val" style="color:var(--amber);" id="streak-val">0</span><span class="sp-unit">days</span></div>
+    <div class="stat-pill"><span class="sp-lbl">grade</span><span class="sp-val" id="grade-val" style="color:var(--red);font-size:16px;">F</span><span class="sp-unit">tier</span></div>
     <div class="stat-pill"><span class="sp-lbl">today xp</span><span class="sp-val" style="color:var(--blue);" id="today-xp-display">0</span><span class="sp-unit">pts</span></div>
     <div class="stat-pill"><span class="sp-lbl">hrs today</span><span class="sp-val" style="color:var(--amber);" id="hours-val">0</span><span class="sp-unit">hrs</span></div>
     <div class="stat-pill"><span class="sp-lbl">balance</span><span class="sp-val" style="color:var(--green);font-size:15px;" id="balance-val">$0</span></div>
   </div>
+  <div class="streak-warn" id="streak-warn">&#9888; XP below 100 — streak at risk if day ends here</div>
 </div>
 <div class="sdiv"><span>Work Shift</span></div>
 <div class="shift-card">
@@ -189,6 +209,24 @@ td.in{color:var(--green);}td.out{color:var(--red);}td.pl{color:var(--purple-ligh
     <div class="dxp-track"><div class="dxp-fill" id="daily-xp-fill" style="width:0%"></div></div>
     <span class="dxp-val mono" id="daily-xp-text">0 / 240 XP</span>
   </div>
+</div>
+<div class="sdiv"><span>Daily Debrief</span></div>
+<div class="debrief-panel">
+  <div class="debrief-lbl">// DAILY DEBRIEF · REFLECT &amp; PLAN</div>
+  <div class="debrief-fields">
+    <div class="debrief-field"><label>What I Did Well</label><textarea id="db-well" placeholder="wins, progress, effort..."></textarea></div>
+    <div class="debrief-field"><label>What I Missed &amp; Why</label><textarea id="db-missed" placeholder="gaps, blockers, excuses..."></textarea></div>
+    <div class="debrief-field"><label>Tomorrow's Focus</label><textarea id="db-tomorrow" placeholder="top priority, intention..."></textarea></div>
+  </div>
+  <div class="debrief-save-row">
+    <button class="debrief-btn" onclick="saveDebrief()">SAVE DEBRIEF</button>
+    <span class="debrief-saved-note" id="debrief-saved-note">SAVED ✓</span>
+  </div>
+</div>
+<div class="sdiv"><span>Debrief History</span></div>
+<div class="debrief-history">
+  <div class="logh"><div class="ldot dot-p"></div><span class="logt">Past Debriefs</span></div>
+  <div class="dh-scroll" id="debrief-history-body"><div class="empty-log">No debriefs yet — save your first one above.</div></div>
 </div>
 <div class="sdiv"><span>System Logs</span></div>
 <div class="logs-top">
@@ -252,7 +290,7 @@ const TOTAL_DAILY=QUESTS.reduce((s,q)=>s+q.xp,0)+SHIFT_XP;
 const TC={big:"tag-big",med:"tag-med",sm:"tag-sm"};
 const TL={big:"BIG",med:"MED",sm:"SMALL"};
 const KEY='solo-dashboard-v3';
-let state={totalXP:0,streak:0,lastDate:null,doneSets:{},shiftByDate:{},workLog:[],financeLog:[],contentLog:[],callsLog:[]};
+let state={totalXP:0,streak:0,lastDate:null,doneSets:{},shiftByDate:{},workLog:[],financeLog:[],contentLog:[],callsLog:[],debriefs:{}};
 let currentModal=null;
 
 function todayKey(){return new Date().toISOString().slice(0,10);}
@@ -264,7 +302,8 @@ function loadState(){
   if(!state.financeLog)state.financeLog=[];
   if(!state.contentLog)state.contentLog=[];
   if(!state.callsLog)state.callsLog=[];
-  checkDayReset();restoreShiftUI();render();
+  if(!state.debriefs)state.debriefs={};
+  checkDayReset();restoreShiftUI();render();loadDebriefForToday();
 }
 
 function saveState(){
@@ -282,7 +321,8 @@ function checkDayReset(){
       const yesterday=new Date();yesterday.setDate(yesterday.getDate()-1);
       const yKey=yesterday.toISOString().slice(0,10);
       const prevShift=state.shiftByDate&&state.shiftByDate[state.lastDate];
-      if(state.lastDate===yKey&&(prev.length>0||prevShift))state.streak=(state.streak||0)+1;
+      const prevXP=prev.reduce((s,i)=>s+(QUESTS[i]?.xp||0),0)+(prevShift?.logged?SHIFT_XP:0);
+      if(state.lastDate===yKey){if(prevXP>=100)state.streak=(state.streak||0)+1;else state.streak=0;}
       else if(state.lastDate!==yKey)state.streak=0;
     }
     state.lastDate=today;
@@ -389,6 +429,10 @@ function calcPrev(xp){if(xp<500)return 0;if(xp<1000)return 500;if(xp<2000)return
 function nextLabel(xp){return{E:'D UNLOCK',D:'C UNLOCK',C:'B UNLOCK',B:'A UNLOCK',A:'S UNLOCK',S:'MAX RANK'}[calcRank(xp)];}
 function calcBalance(){return(state.financeLog||[]).reduce((s,r)=>(s+(parseFloat(r.moneyIn)||0))-(parseFloat(r.moneyOut)||0),0);}
 
+function calcDailyGrade(xp){if(xp>=200)return'S';if(xp>=150)return'A';if(xp>=100)return'B';if(xp>=50)return'C';return'F';}
+function gradeColor(g){return{S:'var(--purple-light)',A:'var(--green)',B:'var(--blue)',C:'var(--amber)',F:'var(--red)'}[g];}
+function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
 function getWeekEarned(dateKey,allShifts){
   if(!dateKey)return'—';
   const ref=new Date(dateKey+'T12:00:00');const day=ref.getDay();
@@ -414,6 +458,13 @@ function render(){
   const filled=Math.round(pct/5);
   document.getElementById('xp-bar-text').textContent='█'.repeat(filled)+'░'.repeat(20-filled)+' '+pct+'% → '+nextLabel(totalXP);
   document.getElementById('streak-val').textContent=state.streak||0;
+
+  const grade=calcDailyGrade(earnedToday);
+  const gradeEl=document.getElementById('grade-val');
+  if(gradeEl){gradeEl.textContent=grade;gradeEl.style.color=gradeColor(grade);}
+  const warnEl=document.getElementById('streak-warn');
+  if(warnEl)warnEl.style.display=earnedToday<100?'block':'none';
+
   document.getElementById('today-xp-display').textContent=earnedToday;
   const shToday=getShiftToday();
   document.getElementById('hours-val').textContent=shToday?shToday.hrs.toFixed(1):'0';
@@ -440,6 +491,7 @@ function render(){
     el.onclick=()=>toggleQuest(i);list.appendChild(el);
   });
   renderLogs();
+  renderDebriefHistory();
 }
 
 function renderLogs(){
@@ -461,6 +513,51 @@ function renderLogs(){
   document.getElementById('content-body').innerHTML=cl.length?cl.map(r=>'<table class="ltable"><tr><td style="width:26%">'+r.date+'</td><td class="pl" style="width:32%">'+r.content+'</td><td style="width:14%">'+(r.tt?'✓':'—')+'</td><td style="width:14%">'+(r.yt?'✓':'—')+'</td><td style="width:14%">'+(r.ig?'✓':'—')+'</td></tr></table>').join(''):'<div class="empty-log">No entries yet</div>';
   const kl=(state.callsLog||[]).slice().reverse().slice(0,5);
   document.getElementById('calls-body').innerHTML=kl.length?kl.map(r=>'<table class="ltable"><tr><td style="width:28%">'+r.date+'</td><td class="bl" style="width:24%">'+r.calls+'</td><td class="bl" style="width:24%">'+r.conv+'</td><td class="in" style="width:24%">'+r.mtg+'</td></tr></table>').join(''):'<div class="empty-log">No entries yet</div>';
+}
+
+function saveDebrief(){
+  const today=todayKey();
+  const done=getTodayDone();
+  const shiftLogged=!!(state.shiftByDate&&state.shiftByDate[today]?.logged);
+  const earned=[...done].reduce((s,i)=>s+QUESTS[i].xp,0)+(shiftLogged?SHIFT_XP:0);
+  const grade=calcDailyGrade(earned);
+  const d=new Date();const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  state.debriefs[today]={
+    well:document.getElementById('db-well').value.trim(),
+    missed:document.getElementById('db-missed').value.trim(),
+    tomorrow:document.getElementById('db-tomorrow').value.trim(),
+    grade,xp:earned,date:months[d.getMonth()]+' '+d.getDate()
+  };
+  saveState();renderDebriefHistory();
+  const note=document.getElementById('debrief-saved-note');
+  note.style.opacity='1';clearTimeout(note._tid);note._tid=setTimeout(()=>note.style.opacity='0',1800);
+}
+
+function loadDebriefForToday(){
+  if(!state.debriefs)return;
+  const d=state.debriefs[todayKey()];if(!d)return;
+  document.getElementById('db-well').value=d.well||'';
+  document.getElementById('db-missed').value=d.missed||'';
+  document.getElementById('db-tomorrow').value=d.tomorrow||'';
+}
+
+function renderDebriefHistory(){
+  const body=document.getElementById('debrief-history-body');if(!body)return;
+  if(!state.debriefs||!Object.keys(state.debriefs).length){
+    body.innerHTML='<div class="empty-log">No debriefs yet — save your first one above.</div>';return;
+  }
+  const entries=Object.entries(state.debriefs).sort((a,b)=>b[0].localeCompare(a[0]));
+  body.innerHTML='<table class="dh-table"><thead><tr>'+
+    '<th style="width:13%">Date</th><th style="width:12%">Grade</th><th style="width:7%">XP</th>'+
+    '<th style="width:34%">What I Missed</th><th style="width:34%">Tomorrow\'s Focus</th>'+
+    '</tr></thead><tbody>'+
+    entries.map(([,d])=>
+      '<tr><td>'+escHtml(d.date)+'</td>'+
+      '<td style="color:'+gradeColor(d.grade)+';font-weight:600">'+d.grade+' TIER</td>'+
+      '<td style="color:var(--blue)">'+d.xp+'</td>'+
+      '<td>'+escHtml(d.missed||'—')+'</td>'+
+      '<td>'+escHtml(d.tomorrow||'—')+'</td></tr>'
+    ).join('')+'</tbody></table>';
 }
 
 function openModal(type){
