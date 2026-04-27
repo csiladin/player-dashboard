@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Player Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#0a0a0f;--surface:#0f0f1a;--surface2:#13131f;
+  --border:#1e1e35;--border-glow:#3a3a6e;
+  --purple:#7c5cbf;--purple-light:#a47fff;--blue:#4a7fff;
+  --text:#d4d4e8;--text-dim:#6b6b99;
+  --green:#4caf7d;--red:#cf4444;--amber:#d4943a;
+}
+body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;font-size:14px;letter-spacing:.02em;min-height:100vh;padding:24px;}
+.mono{font-family:'Share Tech Mono',monospace;}
+.db{max-width:960px;margin:0 auto;}
+.site-header{text-align:center;margin-bottom:24px;}
+.site-header h1{font-size:13px;letter-spacing:.3em;color:var(--purple-light);font-family:'Share Tech Mono',monospace;text-transform:uppercase;}
+.site-header p{font-size:10px;color:var(--text-dim);letter-spacing:.15em;margin-top:4px;font-family:'Share Tech Mono',monospace;}
+.sdiv{display:flex;align-items:center;gap:10px;margin:18px 0 12px;}
+.sdiv span{font-size:9px;letter-spacing:.15em;color:var(--text-dim);text-transform:uppercase;white-space:nowrap;font-family:'Share Tech Mono',monospace;}
+.sdiv::before,.sdiv::after{content:'';flex:1;height:1px;background:var(--border);}
+.hud{background:var(--surface);border:1px solid var(--border);border-top:2px solid var(--purple);border-radius:4px;padding:18px 20px;position:relative;}
+.ca{position:absolute;width:8px;height:8px;border-color:var(--purple);border-style:solid;}
+.ca-tl{top:0;left:0;border-width:1px 0 0 1px;}
+.ca-tr{top:0;right:0;border-width:1px 1px 0 0;}
+.ca-bl{bottom:0;left:0;border-width:0 0 1px 1px;}
+.ca-br{bottom:0;right:0;border-width:0 1px 1px 0;}
+.hud-lbl{font-size:9px;letter-spacing:.2em;color:var(--text-dim);text-transform:uppercase;margin-bottom:14px;font-family:'Share Tech Mono',monospace;}
+.hud-stats{display:grid;grid-template-columns:auto 1fr auto auto auto auto;align-items:center;gap:0 14px;}
+.rank-badge{width:54px;height:54px;border:2px solid var(--purple);border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(124,92,191,.08);}
+.rank-lbl{font-size:9px;color:var(--text-dim);letter-spacing:.1em;}
+.rank-val{font-size:28px;font-weight:600;color:var(--purple-light);line-height:1;}
+.xp-sec{min-width:0;}
+.xp-top{font-size:11px;color:var(--text-dim);margin-bottom:5px;display:flex;justify-content:space-between;}
+.xp-track{height:8px;background:var(--surface2);border:1px solid var(--border);border-radius:2px;overflow:hidden;margin-bottom:5px;}
+.xp-fill{height:100%;background:var(--purple);border-radius:2px;transition:width .5s ease;}
+.xp-txt{font-size:10px;color:var(--text-dim);font-family:'Share Tech Mono',monospace;}
+.edit-xp{display:flex;align-items:center;gap:7px;margin-top:8px;}
+.edit-xp label{font-size:10px;color:var(--text-dim);letter-spacing:.08em;white-space:nowrap;}
+.edit-xp input{background:var(--surface2);border:1px solid var(--border-glow);border-radius:3px;padding:4px 7px;color:var(--text);font-family:'Share Tech Mono',monospace;font-size:12px;width:85px;outline:none;}
+.edit-xp input:focus{border-color:var(--purple);}
+.edit-xp button{background:var(--purple);color:#fff;border:none;border-radius:3px;padding:4px 11px;font-family:'Share Tech Mono',monospace;font-size:10px;cursor:pointer;letter-spacing:.08em;}
+.edit-xp button:hover{background:var(--purple-light);color:#000;}
+.stat-pill{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 10px;border:1px solid var(--border);border-radius:4px;background:var(--surface2);min-width:64px;}
+.sp-lbl{font-size:9px;color:var(--text-dim);letter-spacing:.08em;text-transform:uppercase;}
+.sp-val{font-size:18px;font-weight:600;line-height:1;font-family:'Share Tech Mono',monospace;}
+.sp-unit{font-size:9px;color:var(--text-dim);}
+.shift-card{background:var(--surface);border:1px solid var(--border);border-top:2px solid var(--amber);border-radius:4px;padding:16px 20px;}
+.shift-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+.shift-title{font-size:9px;letter-spacing:.2em;color:var(--text-dim);text-transform:uppercase;font-family:'Share Tech Mono',monospace;}
+.shift-status{font-size:10px;font-family:'Share Tech Mono',monospace;padding:3px 8px;border-radius:2px;letter-spacing:.1em;}
+.shift-status.off{color:var(--text-dim);border:1px solid var(--border);}
+.shift-status.done{color:var(--green);border:1px solid rgba(76,175,125,.4);background:rgba(76,175,125,.08);}
+.shift-body{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:10px;align-items:end;}
+.shift-field{display:flex;flex-direction:column;gap:4px;}
+.shift-field label{font-size:9px;color:var(--text-dim);letter-spacing:.1em;text-transform:uppercase;font-family:'Share Tech Mono',monospace;}
+.shift-field input{background:var(--surface2);border:1px solid var(--border-glow);border-radius:3px;padding:7px 9px;color:var(--text);font-family:'Share Tech Mono',monospace;font-size:13px;outline:none;width:100%;}
+.shift-field input:focus{border-color:var(--amber);}
+.shift-field input:disabled{opacity:.4;cursor:not-allowed;}
+.shift-earned-box{background:var(--surface2);border:1px solid var(--border);border-radius:3px;padding:7px 12px;display:flex;flex-direction:column;gap:2px;}
+.shift-earned-lbl{font-size:9px;color:var(--text-dim);letter-spacing:.1em;text-transform:uppercase;font-family:'Share Tech Mono',monospace;}
+.shift-earned-val{font-size:18px;font-weight:600;color:var(--green);font-family:'Share Tech Mono',monospace;}
+.shift-actions{display:flex;gap:8px;margin-top:12px;align-items:center;}
+.shift-btn{padding:8px 16px;border-radius:3px;font-family:'Share Tech Mono',monospace;font-size:11px;cursor:pointer;letter-spacing:.1em;text-transform:uppercase;border:none;white-space:nowrap;}
+.shift-btn.log{background:var(--amber);color:#000;}
+.shift-btn.log:hover{background:#e8a840;}
+.shift-btn.complete{background:var(--green);color:#000;}
+.shift-btn.reset-btn{background:transparent;color:var(--text-dim);border:1px solid var(--border-glow);font-size:10px;padding:6px 12px;}
+.shift-btn.reset-btn:hover{color:var(--text);}
+.shift-note{flex:1;padding:7px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:3px;font-size:10px;color:var(--text-dim);font-family:'Share Tech Mono',monospace;}
+.quests{background:var(--surface);border:1px solid var(--border);border-top:2px solid var(--blue);border-radius:4px;padding:18px 20px;}
+.q-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:13px;flex-wrap:wrap;gap:6px;}
+.q-title{font-size:9px;letter-spacing:.2em;color:var(--text-dim);text-transform:uppercase;font-family:'Share Tech Mono',monospace;}
+.q-date{font-size:11px;color:var(--text-dim);font-family:'Share Tech Mono',monospace;}
+.q-list{display:flex;flex-direction:column;gap:5px;}
+.qi{display:grid;grid-template-columns:22px 20px 1fr auto auto;align-items:center;gap:8px;padding:9px 11px;border:1px solid var(--border);border-radius:4px;background:var(--surface2);cursor:pointer;transition:border-color .2s,background .2s;position:relative;overflow:hidden;}
+.qi::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--border);transition:background .2s;}
+.qi.done{background:rgba(76,175,125,.06);border-color:rgba(76,175,125,.25);}
+.qi.done::before{background:var(--green);}
+.qi.done .qname{color:var(--green);}
+.qi:hover{border-color:var(--border-glow);}
+.qi.no-click{cursor:default;}
+.qchk{width:17px;height:17px;border:1px solid var(--border-glow);border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--green);}
+.qi.done .qchk{background:rgba(76,175,125,.2);}
+.qicon{font-size:14px;}
+.qname{font-size:13px;font-weight:500;color:var(--text);transition:color .2s;}
+.qxp{font-size:10px;color:var(--purple-light);font-family:'Share Tech Mono',monospace;white-space:nowrap;}
+.qtag{font-size:9px;padding:2px 6px;border-radius:2px;letter-spacing:.06em;text-transform:uppercase;}
+.tag-big{background:rgba(124,92,191,.15);color:var(--purple-light);border:1px solid rgba(124,92,191,.3);}
+.tag-med{background:rgba(74,127,255,.12);color:#6fa3ff;border:1px solid rgba(74,127,255,.25);}
+.tag-sm{background:rgba(100,100,150,.12);color:var(--text-dim);border:1px solid var(--border);}
+.tag-shift{background:rgba(212,148,58,.12);color:var(--amber);border:1px solid rgba(212,148,58,.3);}
+.dxp-bar{margin-top:11px;padding:8px 11px;border:1px solid var(--border);border-radius:4px;background:var(--surface2);display:flex;align-items:center;gap:10px;}
+.dxp-lbl{font-size:9px;color:var(--text-dim);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;font-family:'Share Tech Mono',monospace;}
+.dxp-track{flex:1;height:4px;background:var(--border);border-radius:2px;overflow:hidden;}
+.dxp-fill{height:100%;background:var(--blue);border-radius:2px;transition:width .4s ease;}
+.dxp-val{font-size:10px;font-family:'Share Tech Mono',monospace;color:var(--blue);white-space:nowrap;}
+.logs-top{margin-bottom:10px;}
+.logs-bottom{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;}
+.logp{background:var(--surface);border:1px solid var(--border);border-radius:4px;overflow:hidden;}
+.logp.work-log{border-top:2px solid var(--amber);}
+.logh{padding:8px 11px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:7px;}
+.logh-right{margin-left:auto;display:flex;gap:16px;}
+.logh-stat{font-size:10px;font-family:'Share Tech Mono',monospace;color:var(--text-dim);}
+.logh-stat span{color:var(--amber);}
+.ldot{width:6px;height:6px;border-radius:50%;}
+.dot-g{background:var(--green);}.dot-p{background:var(--purple-light);}.dot-b{background:var(--blue);}.dot-a{background:var(--amber);}
+.logt{font-size:9px;letter-spacing:.12em;color:var(--text-dim);text-transform:uppercase;font-family:'Share Tech Mono',monospace;}
+.ltable{width:100%;border-collapse:collapse;table-layout:fixed;}
+.ltable th{padding:5px 8px;text-align:left;font-size:9px;letter-spacing:.08em;color:var(--text-dim);text-transform:uppercase;border-bottom:1px solid var(--border);font-weight:500;}
+.ltable td{padding:6px 8px;border-bottom:1px solid rgba(30,30,53,.5);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ltable tr:last-child td{border-bottom:none;}
+td.in{color:var(--green);}td.out{color:var(--red);}td.pl{color:var(--purple-light);}td.bl{color:var(--blue);}td.am{color:var(--amber);}td.dim{color:var(--text-dim);}
+.add-btn{display:flex;align-items:center;justify-content:center;gap:5px;padding:7px;border-top:1px dashed var(--border);font-size:10px;color:var(--text-dim);cursor:pointer;transition:color .2s;font-family:'Share Tech Mono',monospace;user-select:none;}
+.add-btn:hover{color:var(--purple-light);}
+.empty-log{padding:10px 11px;font-size:10px;color:var(--text-dim);font-family:'Share Tech Mono',monospace;}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:100;align-items:center;justify-content:center;}
+.modal-bg.open{display:flex;}
+.modal{background:var(--surface);border:1px solid var(--border-glow);border-radius:6px;padding:22px;width:310px;max-width:92vw;}
+.modal h3{font-size:11px;letter-spacing:.18em;color:var(--text-dim);text-transform:uppercase;margin-bottom:16px;font-family:'Share Tech Mono',monospace;}
+.mrow{display:flex;flex-direction:column;gap:4px;margin-bottom:11px;}
+.mrow label{font-size:10px;color:var(--text-dim);letter-spacing:.08em;text-transform:uppercase;}
+.mrow input{background:var(--surface2);border:1px solid var(--border-glow);border-radius:3px;padding:7px 9px;color:var(--text);font-family:'Share Tech Mono',monospace;font-size:12px;outline:none;width:100%;}
+.mrow input:focus{border-color:var(--purple);}
+.mchk-row{display:flex;gap:14px;margin-top:5px;}
+.mchk-row label{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text);cursor:pointer;}
+.mchk-row input[type=checkbox]{accent-color:var(--purple);}
+.mbtn-row{display:flex;gap:8px;margin-top:16px;}
+.mbtn{flex:1;padding:8px;border-radius:3px;font-size:11px;font-family:'Share Tech Mono',monospace;cursor:pointer;letter-spacing:.08em;text-transform:uppercase;}
+.mbtn-confirm{background:var(--purple);color:#fff;border:none;}
+.mbtn-confirm:hover{background:var(--purple-light);color:#000;}
+.mbtn-cancel{background:transparent;color:var(--text-dim);border:1px solid var(--border-glow);}
+.mbtn-cancel:hover{color:var(--text);}
+.toast{position:fixed;top:18px;right:20px;font-size:10px;color:var(--green);font-family:'Share Tech Mono',monospace;opacity:0;transition:opacity .3s;pointer-events:none;letter-spacing:.15em;background:var(--surface2);border:1px solid rgba(76,175,125,.3);padding:5px 12px;border-radius:3px;}
+.footer{text-align:center;margin-top:24px;font-size:10px;color:var(--text-dim);font-family:'Share Tech Mono',monospace;letter-spacing:.1em;}
+</style>
+</head>
+<body>
+<div class="db">
+<div class="site-header">
+  <h1>&#9670; Player Dashboard &#9670;</h1>
+  <p>// SYSTEM ONLINE · DAILY TRACKING ACTIVE</p>
+</div>
+<div class="hud">
+  <div class="ca ca-tl"></div><div class="ca ca-tr"></div><div class="ca ca-bl"></div><div class="ca ca-br"></div>
+  <div class="hud-lbl">// PLAYER HUD · SYSTEM STATUS</div>
+  <div class="hud-stats">
+    <div class="rank-badge"><span class="rank-lbl mono">RANK</span><span class="rank-val mono" id="rank-display">E</span></div>
+    <div class="xp-sec">
+      <div class="xp-top"><span style="color:var(--purple-light);font-size:12px;font-weight:500;">XP PROGRESS</span><span class="mono" id="xp-label-val">0 / 500</span></div>
+      <div class="xp-track"><div class="xp-fill" id="xp-bar" style="width:0%"></div></div>
+      <div class="xp-txt mono" id="xp-bar-text">&nbsp;</div>
+      <div class="edit-xp"><label>TOTAL XP:</label><input type="number" id="xp-input" value="0" min="0" max="99999"/><button onclick="saveXP()">SET XP</button></div>
+    </div>
+    <div class="stat-pill"><span class="sp-lbl">streak</span><span class="sp-val" style="color:var(--amber);" id="streak-val">0</span><span class="sp-unit">days</span></div>
+    <div class="stat-pill"><span class="sp-lbl">today xp</span><span class="sp-val" style="color:var(--blue);" id="today-xp-display">0</span><span class="sp-unit">pts</span></div>
+    <div class="stat-pill"><span class="sp-lbl">hrs today</span><span class="sp-val" style="color:var(--amber);" id="hours-val">0</span><span class="sp-unit">hrs</span></div>
+    <div class="stat-pill"><span class="sp-lbl">balance</span><span class="sp-val" style="color:var(--green);font-size:15px;" id="balance-val">$0</span></div>
+  </div>
+</div>
+<div class="sdiv"><span>Work Shift</span></div>
+<div class="shift-card">
+  <div class="shift-header">
+    <div class="shift-title">// SHIFT TRACKER · LOG YOUR HOURS &amp; PAY</div>
+    <div class="shift-status off mono" id="shift-status">OFF SHIFT</div>
+  </div>
+  <div class="shift-body">
+    <div class="shift-field"><label>Clock In</label><input type="time" id="shift-in"/></div>
+    <div class="shift-field"><label>Clock Out</label><input type="time" id="shift-out"/></div>
+    <div class="shift-field"><label>Hourly Rate ($)</label><input type="number" id="shift-rate" min="0" step="0.25" placeholder="15.00"/></div>
+    <div class="shift-earned-box"><span class="shift-earned-lbl">Earned</span><span class="shift-earned-val" id="shift-earned">$0</span></div>
+  </div>
+  <div class="shift-actions">
+    <button class="shift-btn log" id="shift-main-btn" onclick="handleShiftBtn()">LOG SHIFT</button>
+    <button class="shift-btn reset-btn" onclick="resetShift()">RESET</button>
+    <div class="shift-note" id="shift-summary">Enter clock in, clock out, and your hourly rate — then hit LOG SHIFT.</div>
+  </div>
+</div>
+<div class="sdiv"><span>Daily Quests</span></div>
+<div class="quests">
+  <div class="q-hdr"><div class="q-title">// ACTIVE QUESTS · TODAY</div><div class="q-date mono" id="quest-date"></div></div>
+  <div class="q-list" id="quest-list"></div>
+  <div class="dxp-bar">
+    <span class="dxp-lbl">Today</span>
+    <div class="dxp-track"><div class="dxp-fill" id="daily-xp-fill" style="width:0%"></div></div>
+    <span class="dxp-val mono" id="daily-xp-text">0 / 240 XP</span>
+  </div>
+</div>
+<div class="sdiv"><span>System Logs</span></div>
+<div class="logs-top">
+  <div class="logp work-log">
+    <div class="logh">
+      <div class="ldot dot-a"></div><span class="logt">Work Log</span>
+      <div class="logh-right">
+        <span class="logh-stat">Total hrs: <span id="wl-total-hrs">0</span></span>
+        <span class="logh-stat">Total earned: <span id="wl-total-earned">$0</span></span>
+        <span class="logh-stat">Shifts logged: <span id="wl-total-shifts">0</span></span>
+      </div>
+    </div>
+    <div id="work-log-body"><div class="empty-log">No shifts logged yet — complete a shift above to see it here.</div></div>
+  </div>
+</div>
+<div class="logs-bottom">
+  <div class="logp">
+    <div class="logh"><div class="ldot dot-g"></div><span class="logt">Finance Log</span></div>
+    <table class="ltable"><tr><th style="width:26%">Date</th><th style="width:30%">Type</th><th style="width:22%">In</th><th style="width:22%">Out</th></tr></table>
+    <div id="finance-body"></div>
+    <div class="add-btn" onclick="openModal('finance')">+ add entry</div>
+  </div>
+  <div class="logp">
+    <div class="logh"><div class="ldot dot-p"></div><span class="logt">Content Log</span></div>
+    <table class="ltable"><tr><th style="width:26%">Date</th><th style="width:32%">Content</th><th style="width:14%">TT</th><th style="width:14%">YT</th><th style="width:14%">IG</th></tr></table>
+    <div id="content-body"></div>
+    <div class="add-btn" onclick="openModal('content')">+ add entry</div>
+  </div>
+  <div class="logp">
+    <div class="logh"><div class="ldot dot-b"></div><span class="logt">Call Log</span></div>
+    <table class="ltable"><tr><th style="width:28%">Date</th><th style="width:24%">Calls</th><th style="width:24%">Conv.</th><th style="width:24%">Mtg</th></tr></table>
+    <div id="calls-body"></div>
+    <div class="add-btn" onclick="openModal('calls')">+ add entry</div>
+  </div>
+</div>
+<div class="footer">DATA STORED LOCALLY · YOUR BROWSER · ALWAYS PRIVATE</div>
+</div>
+<div class="modal-bg" id="modal-bg" onclick="bgClick(event)">
+  <div class="modal">
+    <h3 id="modal-title">Add Entry</h3>
+    <div id="modal-fields"></div>
+    <div class="mbtn-row">
+      <button class="mbtn mbtn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="mbtn mbtn-confirm" onclick="submitModal()">Save Entry</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast">SAVED &#10003;</div>
+<script>
+const QUESTS=[
+  {icon:"📞",name:"Calls (10-20)",xp:30,tag:"big"},
+  {icon:"🏋️",name:"Gym / Yoga",xp:30,tag:"big"},
+  {icon:"🎧",name:"Create / Post Content",xp:30,tag:"big"},
+  {icon:"💰",name:"Track Money",xp:20,tag:"med"},
+  {icon:"💧",name:"Drink a Gallon",xp:20,tag:"med"},
+  {icon:"🥗",name:"Eat Clean",xp:10,tag:"sm"},
+  {icon:"🧠",name:"Journal",xp:10,tag:"sm"},
+];
+const SHIFT_XP=50;
+const TOTAL_DAILY=QUESTS.reduce((s,q)=>s+q.xp,0)+SHIFT_XP;
+const TC={big:"tag-big",med:"tag-med",sm:"tag-sm"};
+const TL={big:"BIG",med:"MED",sm:"SMALL"};
+const KEY='solo-dashboard-v3';
+let state={totalXP:0,streak:0,lastDate:null,doneSets:{},shiftByDate:{},workLog:[],financeLog:[],contentLog:[],callsLog:[]};
+let currentModal=null;
+
+function todayKey(){return new Date().toISOString().slice(0,10);}
+
+function loadState(){
+  try{const r=localStorage.getItem(KEY);if(r)state=JSON.parse(r);}catch(e){}
+  if(!state.workLog)state.workLog=[];
+  if(!state.shiftByDate)state.shiftByDate={};
+  if(!state.financeLog)state.financeLog=[];
+  if(!state.contentLog)state.contentLog=[];
+  if(!state.callsLog)state.callsLog=[];
+  checkDayReset();restoreShiftUI();render();
+}
+
+function saveState(){
+  try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}
+  const t=document.getElementById('toast');
+  t.style.opacity='1';clearTimeout(t._tid);
+  t._tid=setTimeout(()=>t.style.opacity='0',1600);
+}
+
+function checkDayReset(){
+  const today=todayKey();
+  if(state.lastDate!==today){
+    if(state.lastDate){
+      const prev=state.doneSets[state.lastDate]||[];
+      const yesterday=new Date();yesterday.setDate(yesterday.getDate()-1);
+      const yKey=yesterday.toISOString().slice(0,10);
+      const prevShift=state.shiftByDate&&state.shiftByDate[state.lastDate];
+      if(state.lastDate===yKey&&(prev.length>0||prevShift))state.streak=(state.streak||0)+1;
+      else if(state.lastDate!==yKey)state.streak=0;
+    }
+    state.lastDate=today;
+    if(!state.doneSets[today])state.doneSets[today]=[];
+    saveState();
+  }
+}
+
+function getTodayDone(){return new Set(state.doneSets[todayKey()]||[]);}
+
+function toggleQuest(i){
+  const today=todayKey();
+  if(!state.doneSets[today])state.doneSets[today]=[];
+  const arr=state.doneSets[today];
+  const idx=arr.indexOf(i);
+  if(idx===-1)arr.push(i);else arr.splice(idx,1);
+  saveState();render();
+}
+
+function saveXP(){state.totalXP=parseInt(document.getElementById('xp-input').value)||0;saveState();render();}
+
+function getShiftToday(){return(state.shiftByDate&&state.shiftByDate[todayKey()])||null;}
+
+function restoreShiftUI(){
+  const sh=getShiftToday();if(!sh)return;
+  if(sh.inTime)document.getElementById('shift-in').value=sh.inTime;
+  if(sh.outTime)document.getElementById('shift-out').value=sh.outTime;
+  if(sh.rate)document.getElementById('shift-rate').value=sh.rate;
+  updateShiftCalc();if(sh.logged)setShiftDoneUI();
+}
+
+function calcShiftHours(){
+  const inV=document.getElementById('shift-in').value;
+  const outV=document.getElementById('shift-out').value;
+  if(!inV||!outV)return 0;
+  const[ih,im]=inV.split(':').map(Number);
+  const[oh,om]=outV.split(':').map(Number);
+  let mins=(oh*60+om)-(ih*60+im);
+  if(mins<0)mins+=24*60;
+  return Math.round((mins/60)*100)/100;
+}
+
+function fmt12(t){
+  if(!t)return'—';
+  const[h,m]=t.split(':').map(Number);
+  const ampm=h>=12?'PM':'AM';const h12=h%12||12;
+  return h12+':'+(m<10?'0':'')+m+' '+ampm;
+}
+
+function updateShiftCalc(){
+  const rate=parseFloat(document.getElementById('shift-rate').value)||0;
+  const hrs=calcShiftHours();const earned=hrs*rate;
+  document.getElementById('shift-earned').textContent='$'+earned.toFixed(2);
+  const sh=getShiftToday();
+  if(hrs>0&&!sh?.logged)document.getElementById('shift-summary').textContent=hrs.toFixed(2)+' hrs · $'+earned.toFixed(2)+' earned — hit LOG SHIFT to save';
+}
+
+function handleShiftBtn(){
+  const sh=getShiftToday();if(sh&&sh.logged)return;
+  const inV=document.getElementById('shift-in').value;
+  const outV=document.getElementById('shift-out').value;
+  const rate=parseFloat(document.getElementById('shift-rate').value)||0;
+  const hrs=calcShiftHours();
+  if(!inV||!outV||hrs<=0||rate<=0){document.getElementById('shift-summary').textContent='Enter clock in, clock out, and hourly rate first.';return;}
+  const earned=hrs*rate;const today=todayKey();
+  const d=new Date();const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const dateStr=months[d.getMonth()]+' '+d.getDate();
+  state.shiftByDate[today]={inTime:inV,outTime:outV,rate,hrs,earned,logged:true,dateStr};
+  state.workLog.push({date:dateStr,dateKey:today,inTime:inV,outTime:outV,rate,hrs,earned});
+  state.financeLog.push({date:dateStr,type:'Work ('+hrs.toFixed(1)+'h @ $'+rate.toFixed(0)+')',moneyIn:earned.toFixed(2),moneyOut:''});
+  saveState();setShiftDoneUI();render();
+}
+
+function setShiftDoneUI(){
+  const sh=getShiftToday();if(!sh)return;
+  document.getElementById('shift-status').textContent='SHIFT LOGGED ✓';
+  document.getElementById('shift-status').className='shift-status done mono';
+  document.getElementById('shift-main-btn').textContent='SHIFT COMPLETE';
+  document.getElementById('shift-main-btn').className='shift-btn complete';
+  ['shift-in','shift-out','shift-rate'].forEach(id=>document.getElementById(id).disabled=true);
+  document.getElementById('shift-summary').textContent=sh.hrs.toFixed(2)+' hrs · $'+sh.earned.toFixed(2)+' earned · saved to Work Log & Finance Log ✓';
+}
+
+function resetShift(){
+  const today=todayKey();
+  if(state.shiftByDate&&state.shiftByDate[today]?.logged){
+    state.workLog=state.workLog.filter(r=>r.dateKey!==today);
+    state.financeLog=state.financeLog.filter(r=>!r.type.startsWith('Work ('));
+    delete state.shiftByDate[today];
+  }
+  ['shift-in','shift-out','shift-rate'].forEach(id=>{const el=document.getElementById(id);el.value='';el.disabled=false;});
+  document.getElementById('shift-status').textContent='OFF SHIFT';
+  document.getElementById('shift-status').className='shift-status off mono';
+  document.getElementById('shift-main-btn').textContent='LOG SHIFT';
+  document.getElementById('shift-main-btn').className='shift-btn log';
+  document.getElementById('shift-earned').textContent='$0';
+  document.getElementById('shift-summary').textContent='Enter clock in, clock out, and your hourly rate — then hit LOG SHIFT.';
+  saveState();render();
+}
+
+function calcRank(xp){if(xp<500)return'E';if(xp<1000)return'D';if(xp<2000)return'C';if(xp<3500)return'B';if(xp<6000)return'A';return'S';}
+function calcNext(xp){if(xp<500)return 500;if(xp<1000)return 1000;if(xp<2000)return 2000;if(xp<3500)return 3500;if(xp<6000)return 6000;return 9999;}
+function calcPrev(xp){if(xp<500)return 0;if(xp<1000)return 500;if(xp<2000)return 1000;if(xp<3500)return 2000;if(xp<6000)return 3500;return 6000;}
+function nextLabel(xp){return{E:'D UNLOCK',D:'C UNLOCK',C:'B UNLOCK',B:'A UNLOCK',A:'S UNLOCK',S:'MAX RANK'}[calcRank(xp)];}
+function calcBalance(){return(state.financeLog||[]).reduce((s,r)=>(s+(parseFloat(r.moneyIn)||0))-(parseFloat(r.moneyOut)||0),0);}
+
+function getWeekEarned(dateKey,allShifts){
+  if(!dateKey)return'—';
+  const ref=new Date(dateKey+'T12:00:00');const day=ref.getDay();
+  const monday=new Date(ref);monday.setDate(ref.getDate()-(day===0?6:day-1));
+  const sunday=new Date(monday);sunday.setDate(monday.getDate()+6);
+  const monKey=monday.toISOString().slice(0,10);const sunKey=sunday.toISOString().slice(0,10);
+  const total=allShifts.filter(r=>r.dateKey>=monKey&&r.dateKey<=sunKey).reduce((s,r)=>s+(parseFloat(r.earned)||0),0);
+  return'$'+total.toFixed(2)+' wk';
+}
+
+function render(){
+  const done=getTodayDone();
+  const shiftLogged=!!(state.shiftByDate&&state.shiftByDate[todayKey()]?.logged);
+  const earnedToday=[...done].reduce((s,i)=>s+QUESTS[i].xp,0)+(shiftLogged?SHIFT_XP:0);
+  const totalXP=(state.totalXP||0)+earnedToday;
+  const next=calcNext(totalXP);const prev=calcPrev(totalXP);
+  const pct=next<=prev?100:Math.round(((totalXP-prev)/(next-prev))*100);
+
+  document.getElementById('rank-display').textContent=calcRank(totalXP);
+  document.getElementById('xp-bar').style.width=pct+'%';
+  document.getElementById('xp-label-val').textContent=totalXP.toLocaleString()+' / '+next.toLocaleString();
+  document.getElementById('xp-input').value=state.totalXP||0;
+  const filled=Math.round(pct/5);
+  document.getElementById('xp-bar-text').textContent='█'.repeat(filled)+'░'.repeat(20-filled)+' '+pct+'% → '+nextLabel(totalXP);
+  document.getElementById('streak-val').textContent=state.streak||0;
+  document.getElementById('today-xp-display').textContent=earnedToday;
+  const shToday=getShiftToday();
+  document.getElementById('hours-val').textContent=shToday?shToday.hrs.toFixed(1):'0';
+  const bal=calcBalance();
+  document.getElementById('balance-val').textContent='$'+Math.abs(Math.round(bal)).toLocaleString()+(bal<0?' ▼':'');
+  const dpct=TOTAL_DAILY>0?Math.round((earnedToday/TOTAL_DAILY)*100):0;
+  document.getElementById('daily-xp-fill').style.width=dpct+'%';
+  document.getElementById('daily-xp-text').textContent=earnedToday+' / '+TOTAL_DAILY+' XP';
+
+  const d=new Date();
+  const days=['SUN','MON','TUE','WED','THU','FRI','SAT'];
+  const months=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  document.getElementById('quest-date').textContent=days[d.getDay()]+' · '+months[d.getMonth()]+' '+d.getDate()+' · '+d.getFullYear();
+
+  const list=document.getElementById('quest-list');list.innerHTML='';
+  const shiftEl=document.createElement('div');
+  shiftEl.className='qi no-click'+(shiftLogged?' done':'');
+  shiftEl.innerHTML='<div class="qchk">'+(shiftLogged?'✓':'')+'</div><span style="font-size:14px">💼</span><span class="qname">Work Shift'+(shiftLogged&&shToday?' ('+shToday.hrs.toFixed(1)+'h · $'+shToday.earned.toFixed(2)+')':' — log above')+'</span><span class="qxp mono">+'+SHIFT_XP+' XP</span><span class="qtag tag-shift">SHIFT</span>';
+  list.appendChild(shiftEl);
+  QUESTS.forEach((q,i)=>{
+    const isDone=done.has(i);const el=document.createElement('div');
+    el.className='qi'+(isDone?' done':'');
+    el.innerHTML='<div class="qchk">'+(isDone?'✓':'')+'</div><span style="font-size:14px">'+q.icon+'</span><span class="qname">'+q.name+'</span><span class="qxp mono">+'+q.xp+' XP</span><span class="qtag '+TC[q.tag]+'">'+TL[q.tag]+'</span>';
+    el.onclick=()=>toggleQuest(i);list.appendChild(el);
+  });
+  renderLogs();
+}
+
+function renderLogs(){
+  const wl=(state.workLog||[]).slice().reverse();
+  const totalHrs=wl.reduce((s,r)=>s+(parseFloat(r.hrs)||0),0);
+  const totalEarned=wl.reduce((s,r)=>s+(parseFloat(r.earned)||0),0);
+  document.getElementById('wl-total-hrs').textContent=totalHrs.toFixed(1);
+  document.getElementById('wl-total-earned').textContent='$'+totalEarned.toFixed(2);
+  document.getElementById('wl-total-shifts').textContent=wl.length;
+  const wb=document.getElementById('work-log-body');
+  if(wl.length===0){wb.innerHTML='<div class="empty-log">No shifts logged yet — complete a shift above to see it here.</div>';}
+  else{
+    wb.innerHTML='<table class="ltable"><tr><th style="width:11%">Date</th><th style="width:13%">In</th><th style="width:13%">Out</th><th style="width:10%">Hours</th><th style="width:10%">Rate</th><th style="width:13%">Earned</th><th style="width:15%">Week Total</th></tr>'+
+    wl.map(r=>'<tr><td>'+r.date+'</td><td class="dim">'+fmt12(r.inTime)+'</td><td class="dim">'+fmt12(r.outTime)+'</td><td class="am">'+parseFloat(r.hrs).toFixed(2)+'h</td><td class="dim">$'+parseFloat(r.rate).toFixed(2)+'</td><td class="in">$'+parseFloat(r.earned).toFixed(2)+'</td><td class="dim">'+getWeekEarned(r.dateKey,wl)+'</td></tr>').join('')+'</table>';
+  }
+  const fl=(state.financeLog||[]).slice().reverse().slice(0,6);
+  document.getElementById('finance-body').innerHTML=fl.length?fl.map(r=>'<table class="ltable"><tr><td style="width:26%">'+r.date+'</td><td style="width:30%">'+r.type+'</td><td class="in" style="width:22%">'+(r.moneyIn?'+$'+parseFloat(r.moneyIn).toFixed(0):'—')+'</td><td class="out" style="width:22%">'+(r.moneyOut?'-$'+parseFloat(r.moneyOut).toFixed(0):'—')+'</td></tr></table>').join(''):'<div class="empty-log">No entries yet</div>';
+  const cl=(state.contentLog||[]).slice().reverse().slice(0,5);
+  document.getElementById('content-body').innerHTML=cl.length?cl.map(r=>'<table class="ltable"><tr><td style="width:26%">'+r.date+'</td><td class="pl" style="width:32%">'+r.content+'</td><td style="width:14%">'+(r.tt?'✓':'—')+'</td><td style="width:14%">'+(r.yt?'✓':'—')+'</td><td style="width:14%">'+(r.ig?'✓':'—')+'</td></tr></table>').join(''):'<div class="empty-log">No entries yet</div>';
+  const kl=(state.callsLog||[]).slice().reverse().slice(0,5);
+  document.getElementById('calls-body').innerHTML=kl.length?kl.map(r=>'<table class="ltable"><tr><td style="width:28%">'+r.date+'</td><td class="bl" style="width:24%">'+r.calls+'</td><td class="bl" style="width:24%">'+r.conv+'</td><td class="in" style="width:24%">'+r.mtg+'</td></tr></table>').join(''):'<div class="empty-log">No entries yet</div>';
+}
+
+function openModal(type){
+  currentModal=type;
+  const d=new Date();const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const dateStr=months[d.getMonth()]+' '+d.getDate();
+  const titles={finance:'Add Finance Entry',content:'Add Content Entry',calls:'Add Call Entry'};
+  document.getElementById('modal-title').textContent=titles[type];
+  const f=document.getElementById('modal-fields');
+  if(type==='finance'){f.innerHTML='<div class="mrow"><label>Date</label><input id="m-date" value="'+dateStr+'"/></div><div class="mrow"><label>Type</label><input id="m-type" placeholder="Food, Gas, Music..."/></div><div class="mrow"><label>Money In ($)</label><input id="m-in" type="number" min="0" step="0.01" placeholder="0.00"/></div><div class="mrow"><label>Money Out ($)</label><input id="m-out" type="number" min="0" step="0.01" placeholder="0.00"/></div>';}
+  else if(type==='content'){f.innerHTML='<div class="mrow"><label>Date</label><input id="m-date" value="'+dateStr+'"/></div><div class="mrow"><label>Content Title</label><input id="m-content" placeholder="Beat drop, freestyle..."/></div><div class="mrow"><label>Platforms Posted</label><div class="mchk-row"><label><input type="checkbox" id="m-tt"> TikTok</label><label><input type="checkbox" id="m-yt"> YouTube</label><label><input type="checkbox" id="m-ig"> Instagram</label></div></div>';}
+  else{f.innerHTML='<div class="mrow"><label>Date</label><input id="m-date" value="'+dateStr+'"/></div><div class="mrow"><label># Calls Made</label><input id="m-calls" type="number" min="0" placeholder="0"/></div><div class="mrow"><label>Conversations</label><input id="m-conv" type="number" min="0" placeholder="0"/></div><div class="mrow"><label>Meetings Set</label><input id="m-mtg" type="number" min="0" placeholder="0"/></div>';}
+  document.getElementById('modal-bg').classList.add('open');
+  setTimeout(()=>{const first=f.querySelector('input');if(first)first.focus();},50);
+}
+
+function closeModal(){document.getElementById('modal-bg').classList.remove('open');currentModal=null;}
+function bgClick(e){if(e.target===document.getElementById('modal-bg'))closeModal();}
+
+function submitModal(){
+  const date=document.getElementById('m-date')?.value||'';
+  if(currentModal==='finance'){state.financeLog.push({date,type:document.getElementById('m-type').value||'—',moneyIn:document.getElementById('m-in').value||'',moneyOut:document.getElementById('m-out').value||''});}
+  else if(currentModal==='content'){state.contentLog.push({date,content:document.getElementById('m-content').value||'—',tt:document.getElementById('m-tt').checked,yt:document.getElementById('m-yt').checked,ig:document.getElementById('m-ig').checked});}
+  else if(currentModal==='calls'){state.callsLog.push({date,calls:document.getElementById('m-calls').value||0,conv:document.getElementById('m-conv').value||0,mtg:document.getElementById('m-mtg').value||0});}
+  saveState();closeModal();render();
+}
+
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+window.addEventListener('DOMContentLoaded',()=>{
+  ['shift-in','shift-out','shift-rate'].forEach(id=>document.getElementById(id).addEventListener('input',updateShiftCalc));
+  loadState();
+});
+</script>
+</body>
+</html>
