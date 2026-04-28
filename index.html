@@ -101,7 +101,10 @@ body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;fo
 .dxp-fill{height:100%;background:var(--blue);border-radius:2px;transition:width .4s ease;}
 .dxp-val{font-size:10px;font-family:'Share Tech Mono',monospace;color:var(--blue);white-space:nowrap;}
 .debrief-panel{background:var(--surface);border:1px solid var(--border);border-top:2px solid var(--purple);border-radius:4px;padding:18px 20px;}
-.debrief-lbl{font-size:9px;letter-spacing:.2em;color:var(--text-dim);text-transform:uppercase;margin-bottom:14px;font-family:'Share Tech Mono',monospace;}
+.debrief-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+.debrief-editing-lbl{font-size:9px;letter-spacing:.2em;color:var(--text-dim);text-transform:uppercase;font-family:'Share Tech Mono',monospace;}
+.debrief-today-btn{background:transparent;color:var(--purple-light);border:1px solid rgba(164,127,255,.35);border-radius:2px;padding:3px 10px;font-family:'Share Tech Mono',monospace;font-size:9px;cursor:pointer;letter-spacing:.1em;text-transform:uppercase;display:none;}
+.debrief-today-btn:hover{background:rgba(124,92,191,.2);}
 .debrief-fields{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px;}
 .debrief-field{display:flex;flex-direction:column;gap:5px;}
 .debrief-field label{font-size:9px;color:var(--text-dim);letter-spacing:.1em;text-transform:uppercase;font-family:'Share Tech Mono',monospace;}
@@ -112,11 +115,19 @@ body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;fo
 .debrief-btn:hover{background:var(--purple-light);color:#000;}
 .debrief-saved-note{font-size:10px;color:var(--green);font-family:'Share Tech Mono',monospace;opacity:0;transition:opacity .3s;}
 .debrief-history{background:var(--surface);border:1px solid var(--border);border-top:2px solid var(--border-glow);border-radius:4px;overflow:hidden;}
-.dh-scroll{max-height:240px;overflow-y:auto;}
 .dh-table{width:100%;border-collapse:collapse;table-layout:fixed;}
-.dh-table th{padding:6px 10px;text-align:left;font-size:9px;letter-spacing:.08em;color:var(--text-dim);text-transform:uppercase;border-bottom:1px solid var(--border);font-weight:500;white-space:nowrap;position:sticky;top:0;background:var(--surface);}
-.dh-table td{padding:7px 10px;border-bottom:1px solid rgba(30,30,53,.5);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.dh-table th{padding:6px 10px;text-align:left;font-size:9px;letter-spacing:.08em;color:var(--text-dim);text-transform:uppercase;border-bottom:1px solid var(--border);font-weight:500;white-space:nowrap;}
+.dh-table td{padding:8px 10px;border-bottom:1px solid rgba(30,30,53,.5);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .dh-table tr:last-child td{border-bottom:none;}
+.dh-row{cursor:pointer;}
+.dh-row:hover td{background:rgba(58,58,110,.18);}
+.dh-row-active td{background:rgba(124,92,191,.1);}
+.dh-row-active td:first-child{border-left:2px solid var(--purple);}
+.dh-pagination{display:flex;align-items:center;justify-content:center;gap:10px;padding:8px 12px;border-top:1px solid var(--border);}
+.dh-nav-btn{background:transparent;color:var(--text-dim);border:1px solid var(--border);border-radius:2px;padding:4px 10px;font-family:'Share Tech Mono',monospace;font-size:9px;cursor:pointer;letter-spacing:.06em;text-transform:uppercase;}
+.dh-nav-btn:hover:not(:disabled){color:var(--text);border-color:var(--border-glow);}
+.dh-nav-btn:disabled{opacity:.25;cursor:default;}
+.dh-page-lbl{font-size:10px;color:var(--text-dim);font-family:'Share Tech Mono',monospace;letter-spacing:.1em;min-width:50px;text-align:center;}
 .logs-top{margin-bottom:10px;}
 .logs-bottom{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;}
 .logp{background:var(--surface);border:1px solid var(--border);border-radius:4px;overflow:hidden;}
@@ -128,11 +139,17 @@ body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;fo
 .ldot{width:6px;height:6px;border-radius:50%;}
 .dot-g{background:var(--green);}.dot-p{background:var(--purple-light);}.dot-b{background:var(--blue);}.dot-a{background:var(--amber);}
 .logt{font-size:9px;letter-spacing:.12em;color:var(--text-dim);text-transform:uppercase;font-family:'Share Tech Mono',monospace;}
+.log-scroll{max-height:200px;overflow-y:auto;}
 .ltable{width:100%;border-collapse:collapse;table-layout:fixed;}
-.ltable th{padding:5px 8px;text-align:left;font-size:9px;letter-spacing:.08em;color:var(--text-dim);text-transform:uppercase;border-bottom:1px solid var(--border);font-weight:500;}
+.ltable thead th{padding:5px 8px;text-align:left;font-size:9px;letter-spacing:.08em;color:var(--text-dim);text-transform:uppercase;border-bottom:1px solid var(--border);font-weight:500;position:sticky;top:0;background:var(--surface);}
 .ltable td{padding:6px 8px;border-bottom:1px solid rgba(30,30,53,.5);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .ltable tr:last-child td{border-bottom:none;}
 td.in{color:var(--green);}td.out{color:var(--red);}td.pl{color:var(--purple-light);}td.bl{color:var(--blue);}td.am{color:var(--amber);}td.dim{color:var(--text-dim);}
+.log-act{display:flex;gap:3px;justify-content:flex-end;}
+.log-act-btn{background:transparent;border:none;cursor:pointer;font-size:13px;padding:1px 5px;border-radius:2px;opacity:.4;transition:opacity .15s;line-height:1;font-family:'Share Tech Mono',monospace;}
+.log-act-btn:hover{opacity:1;}
+.edit-btn{color:var(--blue);}
+.del-btn{color:var(--red);}
 .add-btn{display:flex;align-items:center;justify-content:center;gap:5px;padding:7px;border-top:1px dashed var(--border);font-size:10px;color:var(--text-dim);cursor:pointer;transition:color .2s;font-family:'Share Tech Mono',monospace;user-select:none;}
 .add-btn:hover{color:var(--purple-light);}
 .empty-log{padding:10px 11px;font-size:10px;color:var(--text-dim);font-family:'Share Tech Mono',monospace;}
@@ -211,8 +228,11 @@ td.in{color:var(--green);}td.out{color:var(--red);}td.pl{color:var(--purple-ligh
   </div>
 </div>
 <div class="sdiv"><span>Daily Debrief</span></div>
-<div class="debrief-panel">
-  <div class="debrief-lbl">// DAILY DEBRIEF · REFLECT &amp; PLAN</div>
+<div class="debrief-panel" id="debrief-panel">
+  <div class="debrief-header">
+    <span class="debrief-editing-lbl" id="debrief-editing-lbl">// TODAY · DAILY DEBRIEF</span>
+    <button class="debrief-today-btn" id="debrief-today-btn" onclick="goToTodayDebrief()">&#8592; TODAY</button>
+  </div>
   <div class="debrief-fields">
     <div class="debrief-field"><label>What I Did Well</label><textarea id="db-well" placeholder="wins, progress, effort..."></textarea></div>
     <div class="debrief-field"><label>What I Missed &amp; Why</label><textarea id="db-missed" placeholder="gaps, blockers, excuses..."></textarea></div>
@@ -225,8 +245,13 @@ td.in{color:var(--green);}td.out{color:var(--red);}td.pl{color:var(--purple-ligh
 </div>
 <div class="sdiv"><span>Debrief History</span></div>
 <div class="debrief-history">
-  <div class="logh"><div class="ldot dot-p"></div><span class="logt">Past Debriefs</span></div>
-  <div class="dh-scroll" id="debrief-history-body"><div class="empty-log">No debriefs yet — save your first one above.</div></div>
+  <div class="logh"><div class="ldot dot-p"></div><span class="logt">Past Debriefs</span><span style="margin-left:6px;font-size:9px;color:var(--text-dim);font-family:'Share Tech Mono',monospace;letter-spacing:.06em;">— click a row to edit</span></div>
+  <div id="debrief-history-body"><div class="empty-log">No debriefs yet — save your first one above.</div></div>
+  <div class="dh-pagination" id="dh-pagination" style="display:none;">
+    <button class="dh-nav-btn" id="dh-prev" onclick="debriefPageNav(-1)">&#9664; PREV</button>
+    <span class="dh-page-lbl" id="dh-page-lbl">1 / 1</span>
+    <button class="dh-nav-btn" id="dh-next" onclick="debriefPageNav(1)">NEXT &#9654;</button>
+  </div>
 </div>
 <div class="sdiv"><span>System Logs</span></div>
 <div class="logs-top">
@@ -239,26 +264,23 @@ td.in{color:var(--green);}td.out{color:var(--red);}td.pl{color:var(--purple-ligh
         <span class="logh-stat">Shifts logged: <span id="wl-total-shifts">0</span></span>
       </div>
     </div>
-    <div id="work-log-body"><div class="empty-log">No shifts logged yet — complete a shift above to see it here.</div></div>
+    <div class="log-scroll" id="work-log-body"><div class="empty-log">No shifts logged yet — complete a shift above to see it here.</div></div>
   </div>
 </div>
 <div class="logs-bottom">
   <div class="logp">
     <div class="logh"><div class="ldot dot-g"></div><span class="logt">Finance Log</span></div>
-    <table class="ltable"><tr><th style="width:26%">Date</th><th style="width:30%">Type</th><th style="width:22%">In</th><th style="width:22%">Out</th></tr></table>
-    <div id="finance-body"></div>
+    <div class="log-scroll" id="finance-body"><div class="empty-log">No entries yet</div></div>
     <div class="add-btn" onclick="openModal('finance')">+ add entry</div>
   </div>
   <div class="logp">
     <div class="logh"><div class="ldot dot-p"></div><span class="logt">Content Log</span></div>
-    <table class="ltable"><tr><th style="width:26%">Date</th><th style="width:32%">Content</th><th style="width:14%">TT</th><th style="width:14%">YT</th><th style="width:14%">IG</th></tr></table>
-    <div id="content-body"></div>
+    <div class="log-scroll" id="content-body"><div class="empty-log">No entries yet</div></div>
     <div class="add-btn" onclick="openModal('content')">+ add entry</div>
   </div>
   <div class="logp">
     <div class="logh"><div class="ldot dot-b"></div><span class="logt">Call Log</span></div>
-    <table class="ltable"><tr><th style="width:28%">Date</th><th style="width:24%">Calls</th><th style="width:24%">Conv.</th><th style="width:24%">Mtg</th></tr></table>
-    <div id="calls-body"></div>
+    <div class="log-scroll" id="calls-body"><div class="empty-log">No entries yet</div></div>
     <div class="add-btn" onclick="openModal('calls')">+ add entry</div>
   </div>
 </div>
@@ -290,8 +312,12 @@ const TOTAL_DAILY=QUESTS.reduce((s,q)=>s+q.xp,0)+SHIFT_XP;
 const TC={big:"tag-big",med:"tag-med",sm:"tag-sm"};
 const TL={big:"BIG",med:"MED",sm:"SMALL"};
 const KEY='solo-dashboard-v3';
+const DEBRIEF_PAGE_SIZE=5;
 let state={totalXP:0,streak:0,lastDate:null,doneSets:{},shiftByDate:{},workLog:[],financeLog:[],contentLog:[],callsLog:[],debriefs:{}};
 let currentModal=null;
+let editIndex=null;
+let currentDebriefDate=null;
+let debriefPage=0;
 
 function todayKey(){return new Date().toISOString().slice(0,10);}
 
@@ -303,7 +329,8 @@ function loadState(){
   if(!state.contentLog)state.contentLog=[];
   if(!state.callsLog)state.callsLog=[];
   if(!state.debriefs)state.debriefs={};
-  checkDayReset();restoreShiftUI();render();loadDebriefForToday();
+  currentDebriefDate=todayKey();
+  checkDayReset();restoreShiftUI();render();loadDebriefForDate(todayKey());
 }
 
 function saveState(){
@@ -413,14 +440,16 @@ function resetShift(){
     state.financeLog=state.financeLog.filter(r=>!r.type.startsWith('Work ('));
     delete state.shiftByDate[today];
   }
-  ['shift-in','shift-out','shift-rate'].forEach(id=>{const el=document.getElementById(id);el.value='';el.disabled=false;});
-  document.getElementById('shift-status').textContent='OFF SHIFT';
-  document.getElementById('shift-status').className='shift-status off mono';
-  document.getElementById('shift-main-btn').textContent='LOG SHIFT';
-  document.getElementById('shift-main-btn').className='shift-btn log';
-  document.getElementById('shift-earned').textContent='$0';
-  document.getElementById('shift-summary').textContent='Enter clock in, clock out, and your hourly rate — then hit LOG SHIFT.';
+  resetShiftUIOnly();
   saveState();render();
+}
+
+function resetShiftUIOnly(){
+  ['shift-in','shift-out','shift-rate'].forEach(id=>{const el=document.getElementById(id);if(el){el.value='';el.disabled=false;}});
+  const s=document.getElementById('shift-status');if(s){s.textContent='OFF SHIFT';s.className='shift-status off mono';}
+  const b=document.getElementById('shift-main-btn');if(b){b.textContent='LOG SHIFT';b.className='shift-btn log';}
+  const e=document.getElementById('shift-earned');if(e)e.textContent='$0';
+  const n=document.getElementById('shift-summary');if(n)n.textContent='Enter clock in, clock out, and your hourly rate — then hit LOG SHIFT.';
 }
 
 function calcRank(xp){if(xp<500)return'E';if(xp<1000)return'D';if(xp<2000)return'C';if(xp<3500)return'B';if(xp<6000)return'A';return'S';}
@@ -428,10 +457,10 @@ function calcNext(xp){if(xp<500)return 500;if(xp<1000)return 1000;if(xp<2000)ret
 function calcPrev(xp){if(xp<500)return 0;if(xp<1000)return 500;if(xp<2000)return 1000;if(xp<3500)return 2000;if(xp<6000)return 3500;return 6000;}
 function nextLabel(xp){return{E:'D UNLOCK',D:'C UNLOCK',C:'B UNLOCK',B:'A UNLOCK',A:'S UNLOCK',S:'MAX RANK'}[calcRank(xp)];}
 function calcBalance(){return(state.financeLog||[]).reduce((s,r)=>(s+(parseFloat(r.moneyIn)||0))-(parseFloat(r.moneyOut)||0),0);}
-
 function calcDailyGrade(xp){if(xp>=200)return'S';if(xp>=150)return'A';if(xp>=100)return'B';if(xp>=50)return'C';return'F';}
 function gradeColor(g){return{S:'var(--purple-light)',A:'var(--green)',B:'var(--blue)',C:'var(--amber)',F:'var(--red)'}[g];}
 function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function getLogArray(type){if(type==='finance')return state.financeLog;if(type==='content')return state.contentLog;if(type==='calls')return state.callsLog;return[];}
 
 function getWeekEarned(dateKey,allShifts){
   if(!dateKey)return'—';
@@ -504,84 +533,245 @@ function renderLogs(){
   const wb=document.getElementById('work-log-body');
   if(wl.length===0){wb.innerHTML='<div class="empty-log">No shifts logged yet — complete a shift above to see it here.</div>';}
   else{
-    wb.innerHTML='<table class="ltable"><tr><th style="width:11%">Date</th><th style="width:13%">In</th><th style="width:13%">Out</th><th style="width:10%">Hours</th><th style="width:10%">Rate</th><th style="width:13%">Earned</th><th style="width:15%">Week Total</th></tr>'+
-    wl.map(r=>'<tr><td>'+r.date+'</td><td class="dim">'+fmt12(r.inTime)+'</td><td class="dim">'+fmt12(r.outTime)+'</td><td class="am">'+parseFloat(r.hrs).toFixed(2)+'h</td><td class="dim">$'+parseFloat(r.rate).toFixed(2)+'</td><td class="in">$'+parseFloat(r.earned).toFixed(2)+'</td><td class="dim">'+getWeekEarned(r.dateKey,wl)+'</td></tr>').join('')+'</table>';
+    wb.innerHTML='<table class="ltable"><thead><tr>'+
+      '<th style="width:10%">Date</th><th style="width:11%">In</th><th style="width:11%">Out</th>'+
+      '<th style="width:9%">Hrs</th><th style="width:9%">Rate</th><th style="width:12%">Earned</th>'+
+      '<th style="width:14%">Week</th><th style="width:7%"></th>'+
+      '</tr></thead><tbody>'+
+      wl.map((r,vi)=>{
+        const ai=state.workLog.length-1-vi;
+        return '<tr><td>'+r.date+'</td><td class="dim">'+fmt12(r.inTime)+'</td><td class="dim">'+fmt12(r.outTime)+'</td>'+
+          '<td class="am">'+parseFloat(r.hrs).toFixed(2)+'h</td><td class="dim">$'+parseFloat(r.rate).toFixed(2)+'</td>'+
+          '<td class="in">$'+parseFloat(r.earned).toFixed(2)+'</td><td class="dim">'+getWeekEarned(r.dateKey,wl)+'</td>'+
+          '<td><div class="log-act"><button class="log-act-btn del-btn" onclick="deleteWorkLog('+ai+')" title="Delete">×</button></div></td></tr>';
+      }).join('')+'</tbody></table>';
   }
-  const fl=(state.financeLog||[]).slice().reverse().slice(0,6);
-  document.getElementById('finance-body').innerHTML=fl.length?fl.map(r=>'<table class="ltable"><tr><td style="width:26%">'+r.date+'</td><td style="width:30%">'+r.type+'</td><td class="in" style="width:22%">'+(r.moneyIn?'+$'+parseFloat(r.moneyIn).toFixed(0):'—')+'</td><td class="out" style="width:22%">'+(r.moneyOut?'-$'+parseFloat(r.moneyOut).toFixed(0):'—')+'</td></tr></table>').join(''):'<div class="empty-log">No entries yet</div>';
-  const cl=(state.contentLog||[]).slice().reverse().slice(0,5);
-  document.getElementById('content-body').innerHTML=cl.length?cl.map(r=>'<table class="ltable"><tr><td style="width:26%">'+r.date+'</td><td class="pl" style="width:32%">'+r.content+'</td><td style="width:14%">'+(r.tt?'✓':'—')+'</td><td style="width:14%">'+(r.yt?'✓':'—')+'</td><td style="width:14%">'+(r.ig?'✓':'—')+'</td></tr></table>').join(''):'<div class="empty-log">No entries yet</div>';
-  const kl=(state.callsLog||[]).slice().reverse().slice(0,5);
-  document.getElementById('calls-body').innerHTML=kl.length?kl.map(r=>'<table class="ltable"><tr><td style="width:28%">'+r.date+'</td><td class="bl" style="width:24%">'+r.calls+'</td><td class="bl" style="width:24%">'+r.conv+'</td><td class="in" style="width:24%">'+r.mtg+'</td></tr></table>').join(''):'<div class="empty-log">No entries yet</div>';
+
+  const fl=(state.financeLog||[]).slice().reverse();
+  const fb=document.getElementById('finance-body');
+  fb.innerHTML=fl.length?
+    '<table class="ltable"><thead><tr><th style="width:22%">Date</th><th style="width:28%">Type</th><th style="width:18%">In</th><th style="width:18%">Out</th><th style="width:14%"></th></tr></thead><tbody>'+
+    fl.map((r,vi)=>{
+      const ai=state.financeLog.length-1-vi;
+      return '<tr><td>'+escHtml(r.date)+'</td><td>'+escHtml(r.type)+'</td>'+
+        '<td class="in">'+(r.moneyIn?'+$'+parseFloat(r.moneyIn).toFixed(0):'—')+'</td>'+
+        '<td class="out">'+(r.moneyOut?'-$'+parseFloat(r.moneyOut).toFixed(0):'—')+'</td>'+
+        '<td><div class="log-act">'+
+        '<button class="log-act-btn edit-btn" onclick="openModal(\'finance\','+ai+')" title="Edit">✏</button>'+
+        '<button class="log-act-btn del-btn" onclick="deleteLogEntry(\'finance\','+ai+')" title="Delete">×</button>'+
+        '</div></td></tr>';
+    }).join('')+'</tbody></table>':
+    '<div class="empty-log">No entries yet</div>';
+
+  const cl=(state.contentLog||[]).slice().reverse();
+  const cb=document.getElementById('content-body');
+  cb.innerHTML=cl.length?
+    '<table class="ltable"><thead><tr><th style="width:22%">Date</th><th style="width:30%">Content</th><th style="width:10%">TT</th><th style="width:10%">YT</th><th style="width:10%">IG</th><th style="width:18%"></th></tr></thead><tbody>'+
+    cl.map((r,vi)=>{
+      const ai=state.contentLog.length-1-vi;
+      return '<tr><td>'+escHtml(r.date)+'</td><td class="pl">'+escHtml(r.content)+'</td>'+
+        '<td>'+(r.tt?'✓':'—')+'</td><td>'+(r.yt?'✓':'—')+'</td><td>'+(r.ig?'✓':'—')+'</td>'+
+        '<td><div class="log-act">'+
+        '<button class="log-act-btn edit-btn" onclick="openModal(\'content\','+ai+')" title="Edit">✏</button>'+
+        '<button class="log-act-btn del-btn" onclick="deleteLogEntry(\'content\','+ai+')" title="Delete">×</button>'+
+        '</div></td></tr>';
+    }).join('')+'</tbody></table>':
+    '<div class="empty-log">No entries yet</div>';
+
+  const kl=(state.callsLog||[]).slice().reverse();
+  const kb=document.getElementById('calls-body');
+  kb.innerHTML=kl.length?
+    '<table class="ltable"><thead><tr><th style="width:24%">Date</th><th style="width:18%">Calls</th><th style="width:18%">Conv.</th><th style="width:18%">Mtg</th><th style="width:22%"></th></tr></thead><tbody>'+
+    kl.map((r,vi)=>{
+      const ai=state.callsLog.length-1-vi;
+      return '<tr><td>'+escHtml(r.date)+'</td><td class="bl">'+r.calls+'</td><td class="bl">'+r.conv+'</td><td class="in">'+r.mtg+'</td>'+
+        '<td><div class="log-act">'+
+        '<button class="log-act-btn edit-btn" onclick="openModal(\'calls\','+ai+')" title="Edit">✏</button>'+
+        '<button class="log-act-btn del-btn" onclick="deleteLogEntry(\'calls\','+ai+')" title="Delete">×</button>'+
+        '</div></td></tr>';
+    }).join('')+'</tbody></table>':
+    '<div class="empty-log">No entries yet</div>';
 }
 
-function saveDebrief(){
+function deleteLogEntry(type,index){
+  getLogArray(type).splice(index,1);
+  saveState();render();
+}
+
+function deleteWorkLog(index){
+  const entry=state.workLog[index];if(!entry)return;
+  const dateKey=entry.dateKey;
+  state.workLog.splice(index,1);
+  state.financeLog=state.financeLog.filter(r=>!(r.type.startsWith('Work (')&&r.date===entry.date));
+  if(state.shiftByDate&&state.shiftByDate[dateKey]){
+    delete state.shiftByDate[dateKey];
+    if(dateKey===todayKey())resetShiftUIOnly();
+  }
+  saveState();render();
+}
+
+function loadDebriefForDate(dateKey,scroll){
+  currentDebriefDate=dateKey;
+  const d=state.debriefs[dateKey];
+  document.getElementById('db-well').value=d?.well||'';
+  document.getElementById('db-missed').value=d?.missed||'';
+  document.getElementById('db-tomorrow').value=d?.tomorrow||'';
+  updateDebriefHeader();
+  renderDebriefHistory();
+  if(scroll)document.getElementById('debrief-panel').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function updateDebriefHeader(){
   const today=todayKey();
-  const done=getTodayDone();
-  const shiftLogged=!!(state.shiftByDate&&state.shiftByDate[today]?.logged);
-  const earned=[...done].reduce((s,i)=>s+QUESTS[i].xp,0)+(shiftLogged?SHIFT_XP:0);
-  const grade=calcDailyGrade(earned);
-  const d=new Date();const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  state.debriefs[today]={
+  const isToday=currentDebriefDate===today;
+  const lbl=document.getElementById('debrief-editing-lbl');
+  const btn=document.getElementById('debrief-today-btn');
+  if(lbl){
+    if(isToday){lbl.textContent='// TODAY · DAILY DEBRIEF';}
+    else{
+      const d=state.debriefs[currentDebriefDate];
+      lbl.textContent='// EDITING: '+(d?.date||currentDebriefDate)+(d?' · '+d.grade+' TIER':'');
+    }
+  }
+  if(btn)btn.style.display=isToday?'none':'inline-block';
+}
+
+function goToTodayDebrief(){loadDebriefForDate(todayKey());}
+
+function saveDebrief(){
+  const target=currentDebriefDate||todayKey();
+  const existing=state.debriefs[target]||{};
+  let grade,xp,dateStr;
+  if(target===todayKey()){
+    const done=getTodayDone();
+    const shiftLogged=!!(state.shiftByDate&&state.shiftByDate[target]?.logged);
+    xp=[...done].reduce((s,i)=>s+QUESTS[i].xp,0)+(shiftLogged?SHIFT_XP:0);
+    grade=calcDailyGrade(xp);
+    const d=new Date();const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    dateStr=months[d.getMonth()]+' '+d.getDate();
+  }else{
+    xp=existing.xp||0;grade=existing.grade||calcDailyGrade(xp);dateStr=existing.date||target;
+  }
+  state.debriefs[target]={
     well:document.getElementById('db-well').value.trim(),
     missed:document.getElementById('db-missed').value.trim(),
     tomorrow:document.getElementById('db-tomorrow').value.trim(),
-    grade,xp:earned,date:months[d.getMonth()]+' '+d.getDate()
+    grade,xp,date:dateStr
   };
-  saveState();renderDebriefHistory();
+  saveState();updateDebriefHeader();renderDebriefHistory();
   const note=document.getElementById('debrief-saved-note');
   note.style.opacity='1';clearTimeout(note._tid);note._tid=setTimeout(()=>note.style.opacity='0',1800);
 }
 
-function loadDebriefForToday(){
+function deleteDebrief(dateKey){
   if(!state.debriefs)return;
-  const d=state.debriefs[todayKey()];if(!d)return;
-  document.getElementById('db-well').value=d.well||'';
-  document.getElementById('db-missed').value=d.missed||'';
-  document.getElementById('db-tomorrow').value=d.tomorrow||'';
+  delete state.debriefs[dateKey];
+  if(currentDebriefDate===dateKey){
+    currentDebriefDate=todayKey();
+    loadDebriefForDate(todayKey());
+  }
+  saveState();renderDebriefHistory();
+}
+
+function debriefPageNav(dir){
+  const total=Object.keys(state.debriefs||{}).length;
+  const totalPages=Math.max(1,Math.ceil(total/DEBRIEF_PAGE_SIZE));
+  debriefPage=Math.max(0,Math.min(debriefPage+dir,totalPages-1));
+  renderDebriefHistory();
 }
 
 function renderDebriefHistory(){
   const body=document.getElementById('debrief-history-body');if(!body)return;
+  const pagination=document.getElementById('dh-pagination');
   if(!state.debriefs||!Object.keys(state.debriefs).length){
-    body.innerHTML='<div class="empty-log">No debriefs yet — save your first one above.</div>';return;
+    body.innerHTML='<div class="empty-log">No debriefs yet — save your first one above.</div>';
+    if(pagination)pagination.style.display='none';
+    return;
   }
   const entries=Object.entries(state.debriefs).sort((a,b)=>b[0].localeCompare(a[0]));
+  const totalPages=Math.max(1,Math.ceil(entries.length/DEBRIEF_PAGE_SIZE));
+  debriefPage=Math.max(0,Math.min(debriefPage,totalPages-1));
+  const page=entries.slice(debriefPage*DEBRIEF_PAGE_SIZE,(debriefPage+1)*DEBRIEF_PAGE_SIZE);
+
+  if(pagination){
+    pagination.style.display=entries.length>DEBRIEF_PAGE_SIZE?'flex':'none';
+    const prevBtn=document.getElementById('dh-prev');
+    const nextBtn=document.getElementById('dh-next');
+    const pageLbl=document.getElementById('dh-page-lbl');
+    if(prevBtn)prevBtn.disabled=debriefPage===0;
+    if(nextBtn)nextBtn.disabled=debriefPage>=totalPages-1;
+    if(pageLbl)pageLbl.textContent=(debriefPage+1)+' / '+totalPages;
+  }
+
   body.innerHTML='<table class="dh-table"><thead><tr>'+
-    '<th style="width:13%">Date</th><th style="width:12%">Grade</th><th style="width:7%">XP</th>'+
-    '<th style="width:34%">What I Missed</th><th style="width:34%">Tomorrow\'s Focus</th>'+
+    '<th style="width:12%">Date</th><th style="width:11%">Grade</th><th style="width:6%">XP</th>'+
+    '<th style="width:30%">What I Missed</th><th style="width:30%">Tomorrow\'s Focus</th><th style="width:11%"></th>'+
     '</tr></thead><tbody>'+
-    entries.map(([,d])=>
-      '<tr><td>'+escHtml(d.date)+'</td>'+
-      '<td style="color:'+gradeColor(d.grade)+';font-weight:600">'+d.grade+' TIER</td>'+
-      '<td style="color:var(--blue)">'+d.xp+'</td>'+
-      '<td>'+escHtml(d.missed||'—')+'</td>'+
-      '<td>'+escHtml(d.tomorrow||'—')+'</td></tr>'
-    ).join('')+'</tbody></table>';
+    page.map(([key,d])=>{
+      const isActive=key===currentDebriefDate;
+      return '<tr class="dh-row'+(isActive?' dh-row-active':'')+'" onclick="loadDebriefForDate(\''+key+'\',true)">'+
+        '<td>'+escHtml(d.date)+'</td>'+
+        '<td style="color:'+gradeColor(d.grade)+';font-weight:600">'+d.grade+' TIER</td>'+
+        '<td style="color:var(--blue)">'+d.xp+'</td>'+
+        '<td>'+escHtml(d.missed||'—')+'</td>'+
+        '<td>'+escHtml(d.tomorrow||'—')+'</td>'+
+        '<td><div class="log-act"><button class="log-act-btn del-btn" onclick="event.stopPropagation();deleteDebrief(\''+key+'\')" title="Delete">×</button></div></td>'+
+        '</tr>';
+    }).join('')+'</tbody></table>';
 }
 
-function openModal(type){
+function openModal(type,editIdx){
   currentModal=type;
+  editIndex=(editIdx!==undefined&&editIdx!==null)?editIdx:null;
+  const isEdit=editIndex!==null;
+  const existing=isEdit?getLogArray(type)[editIndex]:null;
   const d=new Date();const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   const dateStr=months[d.getMonth()]+' '+d.getDate();
-  const titles={finance:'Add Finance Entry',content:'Add Content Entry',calls:'Add Call Entry'};
+  const titles={
+    finance:isEdit?'Edit Finance Entry':'Add Finance Entry',
+    content:isEdit?'Edit Content Entry':'Add Content Entry',
+    calls:isEdit?'Edit Call Entry':'Add Call Entry'
+  };
   document.getElementById('modal-title').textContent=titles[type];
   const f=document.getElementById('modal-fields');
-  if(type==='finance'){f.innerHTML='<div class="mrow"><label>Date</label><input id="m-date" value="'+dateStr+'"/></div><div class="mrow"><label>Type</label><input id="m-type" placeholder="Food, Gas, Music..."/></div><div class="mrow"><label>Money In ($)</label><input id="m-in" type="number" min="0" step="0.01" placeholder="0.00"/></div><div class="mrow"><label>Money Out ($)</label><input id="m-out" type="number" min="0" step="0.01" placeholder="0.00"/></div>';}
-  else if(type==='content'){f.innerHTML='<div class="mrow"><label>Date</label><input id="m-date" value="'+dateStr+'"/></div><div class="mrow"><label>Content Title</label><input id="m-content" placeholder="Beat drop, freestyle..."/></div><div class="mrow"><label>Platforms Posted</label><div class="mchk-row"><label><input type="checkbox" id="m-tt"> TikTok</label><label><input type="checkbox" id="m-yt"> YouTube</label><label><input type="checkbox" id="m-ig"> Instagram</label></div></div>';}
-  else{f.innerHTML='<div class="mrow"><label>Date</label><input id="m-date" value="'+dateStr+'"/></div><div class="mrow"><label># Calls Made</label><input id="m-calls" type="number" min="0" placeholder="0"/></div><div class="mrow"><label>Conversations</label><input id="m-conv" type="number" min="0" placeholder="0"/></div><div class="mrow"><label>Meetings Set</label><input id="m-mtg" type="number" min="0" placeholder="0"/></div>';}
+  if(type==='finance'){
+    f.innerHTML='<div class="mrow"><label>Date</label><input id="m-date" value="'+escHtml(existing?.date||dateStr)+'"/></div>'+
+      '<div class="mrow"><label>Type</label><input id="m-type" value="'+escHtml(existing?.type&&existing.type!=='—'?existing.type:'')+'" placeholder="Food, Gas, Music..."/></div>'+
+      '<div class="mrow"><label>Money In ($)</label><input id="m-in" type="number" min="0" step="0.01" value="'+(existing?.moneyIn||'')+'" placeholder="0.00"/></div>'+
+      '<div class="mrow"><label>Money Out ($)</label><input id="m-out" type="number" min="0" step="0.01" value="'+(existing?.moneyOut||'')+'" placeholder="0.00"/></div>';
+  }else if(type==='content'){
+    f.innerHTML='<div class="mrow"><label>Date</label><input id="m-date" value="'+escHtml(existing?.date||dateStr)+'"/></div>'+
+      '<div class="mrow"><label>Content Title</label><input id="m-content" value="'+escHtml(existing?.content&&existing.content!=='—'?existing.content:'')+'" placeholder="Beat drop, freestyle..."/></div>'+
+      '<div class="mrow"><label>Platforms Posted</label><div class="mchk-row">'+
+      '<label><input type="checkbox" id="m-tt"'+(existing?.tt?' checked':'')+'/> TikTok</label>'+
+      '<label><input type="checkbox" id="m-yt"'+(existing?.yt?' checked':'')+'/> YouTube</label>'+
+      '<label><input type="checkbox" id="m-ig"'+(existing?.ig?' checked':'')+'/> Instagram</label>'+
+      '</div></div>';
+  }else{
+    f.innerHTML='<div class="mrow"><label>Date</label><input id="m-date" value="'+escHtml(existing?.date||dateStr)+'"/></div>'+
+      '<div class="mrow"><label># Calls Made</label><input id="m-calls" type="number" min="0" value="'+(existing?.calls||'')+'" placeholder="0"/></div>'+
+      '<div class="mrow"><label>Conversations</label><input id="m-conv" type="number" min="0" value="'+(existing?.conv||'')+'" placeholder="0"/></div>'+
+      '<div class="mrow"><label>Meetings Set</label><input id="m-mtg" type="number" min="0" value="'+(existing?.mtg||'')+'" placeholder="0"/></div>';
+  }
   document.getElementById('modal-bg').classList.add('open');
   setTimeout(()=>{const first=f.querySelector('input');if(first)first.focus();},50);
 }
 
-function closeModal(){document.getElementById('modal-bg').classList.remove('open');currentModal=null;}
+function closeModal(){document.getElementById('modal-bg').classList.remove('open');currentModal=null;editIndex=null;}
 function bgClick(e){if(e.target===document.getElementById('modal-bg'))closeModal();}
 
 function submitModal(){
   const date=document.getElementById('m-date')?.value||'';
-  if(currentModal==='finance'){state.financeLog.push({date,type:document.getElementById('m-type').value||'—',moneyIn:document.getElementById('m-in').value||'',moneyOut:document.getElementById('m-out').value||''});}
-  else if(currentModal==='content'){state.contentLog.push({date,content:document.getElementById('m-content').value||'—',tt:document.getElementById('m-tt').checked,yt:document.getElementById('m-yt').checked,ig:document.getElementById('m-ig').checked});}
-  else if(currentModal==='calls'){state.callsLog.push({date,calls:document.getElementById('m-calls').value||0,conv:document.getElementById('m-conv').value||0,mtg:document.getElementById('m-mtg').value||0});}
+  let entry;
+  if(currentModal==='finance'){
+    entry={date,type:document.getElementById('m-type').value||'—',moneyIn:document.getElementById('m-in').value||'',moneyOut:document.getElementById('m-out').value||''};
+  }else if(currentModal==='content'){
+    entry={date,content:document.getElementById('m-content').value||'—',tt:document.getElementById('m-tt').checked,yt:document.getElementById('m-yt').checked,ig:document.getElementById('m-ig').checked};
+  }else if(currentModal==='calls'){
+    entry={date,calls:document.getElementById('m-calls').value||0,conv:document.getElementById('m-conv').value||0,mtg:document.getElementById('m-mtg').value||0};
+  }
+  if(editIndex!==null){getLogArray(currentModal)[editIndex]=entry;}
+  else{getLogArray(currentModal).push(entry);}
   saveState();closeModal();render();
 }
 
