@@ -65,6 +65,14 @@ body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;fo
 .shift-earned-box{background:var(--surface2);border:1px solid var(--border);border-radius:3px;padding:7px 12px;display:flex;flex-direction:column;gap:2px;}
 .shift-earned-lbl{font-size:9px;color:var(--text-dim);letter-spacing:.1em;text-transform:uppercase;font-family:'Share Tech Mono',monospace;}
 .shift-earned-val{font-size:18px;font-weight:600;color:var(--green);font-family:'Share Tech Mono',monospace;}
+.shift-net-val{font-size:12px;color:var(--green);font-family:'Share Tech Mono',monospace;opacity:.7;}
+.budget-tax-section{display:none;padding:9px 14px;background:rgba(0,0,0,.25);border:1px solid var(--border);border-radius:3px;margin-bottom:10px;font-family:'Share Tech Mono',monospace;}
+.btax-row{display:flex;justify-content:space-between;align-items:center;padding:2px 0;}
+.btax-lbl{font-size:9px;color:var(--text-dim);letter-spacing:.08em;text-transform:uppercase;}
+.btax-neg{font-size:10px;color:var(--red);}
+.btax-divider{height:1px;background:var(--border);margin:4px 0;}
+.btax-net{font-size:12px;color:var(--green);font-weight:600;}
+.btax-note{font-size:8px;color:var(--text-dim);margin-left:6px;}
 .shift-actions{display:flex;gap:8px;margin-top:12px;align-items:center;}
 .shift-btn{padding:8px 16px;border-radius:3px;font-family:'Share Tech Mono',monospace;font-size:11px;cursor:pointer;letter-spacing:.1em;text-transform:uppercase;border:none;white-space:nowrap;}
 .shift-btn.log{background:var(--amber);color:#000;}
@@ -235,7 +243,7 @@ td.in{color:var(--green);}td.out{color:var(--red);}td.pl{color:var(--purple-ligh
     <div class="shift-field"><label>Clock In</label><input type="time" id="shift-in"/></div>
     <div class="shift-field"><label>Clock Out</label><input type="time" id="shift-out"/></div>
     <div class="shift-field"><label>Hourly Rate ($)</label><input type="number" id="shift-rate" min="0" step="0.25" placeholder="15.00"/></div>
-    <div class="shift-earned-box"><span class="shift-earned-lbl">Earned</span><span class="shift-earned-val" id="shift-earned">$0</span></div>
+    <div class="shift-earned-box"><span class="shift-earned-lbl">Gross</span><span class="shift-earned-val" id="shift-earned">$0</span><span class="shift-earned-lbl" style="margin-top:4px">Est. Net</span><span class="shift-net-val" id="shift-net">$0</span></div>
   </div>
   <div class="shift-actions">
     <button class="shift-btn log" id="shift-main-btn" onclick="handleShiftBtn()">LOG SHIFT</button>
@@ -288,6 +296,13 @@ td.in{color:var(--green);}td.out{color:var(--red);}td.pl{color:var(--purple-ligh
       <span class="budget-income-val" id="budget-total-income">$0</span>
     </div>
   </div>
+  <div class="budget-tax-section" id="budget-tax-section">
+    <div class="btax-row"><span class="btax-lbl">FICA (SS + Medicare 7.65%)</span><span class="btax-neg" id="bt-fica">—</span></div>
+    <div class="btax-row"><span class="btax-lbl">Federal Income Tax (est.)</span><span class="btax-neg" id="bt-fed">—</span></div>
+    <div class="btax-row"><span class="btax-lbl">WV State Tax (est.)</span><span class="btax-neg" id="bt-wv">—</span></div>
+    <div class="btax-divider"></div>
+    <div class="btax-row"><span class="btax-lbl" style="color:var(--green)">Est. Net Take-Home</span><span class="btax-net" id="bt-net">—</span><span class="btax-note" id="bt-rate"></span></div>
+  </div>
   <div class="budget-cats" id="budget-cats"></div>
   <div class="budget-footer" id="budget-footer" style="display:none;">
     Uncategorized spending: <span id="budget-uncat">$0</span> — tag entries in the Finance Log to track them
@@ -301,6 +316,7 @@ td.in{color:var(--green);}td.out{color:var(--red);}td.pl{color:var(--purple-ligh
       <div class="logh-right">
         <span class="logh-stat">Total hrs: <span id="wl-total-hrs">0</span></span>
         <span class="logh-stat">Total earned: <span id="wl-total-earned">$0</span></span>
+        <span class="logh-stat">Est. net: <span id="wl-total-net">$0</span></span>
         <span class="logh-stat">Shifts logged: <span id="wl-total-shifts">0</span></span>
       </div>
     </div>
@@ -455,12 +471,33 @@ function fmt12(t){
   return h12+':'+(m<10?'0':'')+m+' '+ampm;
 }
 
+// WV + Federal + FICA tax estimator (2025 rates, single filer)
+function estimateTaxes(annualGross){
+  if(annualGross<=0)return{fed:0,wv:0,fica:0,total:0,net:0,effectiveRate:0};
+  const fica=Math.min(annualGross,176100)*0.062+annualGross*0.0145;
+  const fedTaxable=Math.max(0,annualGross-15000);
+  const fedB=[[11925,.10],[36550,.12],[54875,.22],[93950,.24],[Infinity,.32]];
+  let fed=0,rem=fedTaxable;
+  for(const[w,r]of fedB){if(rem<=0)break;const t=Math.min(rem,w);fed+=t*r;rem-=t;}
+  const wvTaxable=Math.max(0,annualGross-2000);
+  const wvB=[[10000,.0236],[15000,.0315],[15000,.0354],[20000,.0472],[Infinity,.0512]];
+  let wv=0,wvR=wvTaxable;
+  for(const[w,r]of wvB){if(wvR<=0)break;const t=Math.min(wvR,w);wv+=t*r;wvR-=t;}
+  const total=fed+wv+fica;
+  return{fed,wv,fica,total,net:annualGross-total,effectiveRate:total/annualGross};
+}
+
 function updateShiftCalc(){
   const rate=parseFloat(document.getElementById('shift-rate').value)||0;
   const hrs=calcShiftHours();const earned=hrs*rate;
   document.getElementById('shift-earned').textContent='$'+earned.toFixed(2);
+  const netEl=document.getElementById('shift-net');
+  if(netEl){
+    if(earned>0&&rate>0){const{effectiveRate}=estimateTaxes(rate*2080);netEl.textContent='~$'+(earned*(1-effectiveRate)).toFixed(2);}
+    else netEl.textContent='$0';
+  }
   const sh=getShiftToday();
-  if(hrs>0&&!sh?.logged)document.getElementById('shift-summary').textContent=hrs.toFixed(2)+' hrs · $'+earned.toFixed(2)+' earned — hit LOG SHIFT to save';
+  if(hrs>0&&!sh?.logged)document.getElementById('shift-summary').textContent=hrs.toFixed(2)+' hrs · $'+earned.toFixed(2)+' gross — hit LOG SHIFT to save';
 }
 
 function handleShiftBtn(){
@@ -486,7 +523,9 @@ function setShiftDoneUI(){
   document.getElementById('shift-main-btn').textContent='SHIFT COMPLETE';
   document.getElementById('shift-main-btn').className='shift-btn complete';
   ['shift-in','shift-out','shift-rate'].forEach(id=>document.getElementById(id).disabled=true);
-  document.getElementById('shift-summary').textContent=sh.hrs.toFixed(2)+' hrs · $'+sh.earned.toFixed(2)+' earned · saved to Work Log & Finance Log ✓';
+  const{effectiveRate}=estimateTaxes(sh.rate*2080);
+  const net=sh.earned*(1-effectiveRate);
+  document.getElementById('shift-summary').textContent=sh.hrs.toFixed(2)+' hrs · $'+sh.earned.toFixed(2)+' gross · ~$'+net.toFixed(2)+' net after WV+fed taxes ✓';
 }
 
 function resetShift(){
@@ -607,22 +646,28 @@ function renderLogs(){
   const wl=(state.workLog||[]).slice().reverse();
   const totalHrs=wl.reduce((s,r)=>s+(parseFloat(r.hrs)||0),0);
   const totalEarned=wl.reduce((s,r)=>s+(parseFloat(r.earned)||0),0);
+  const totalNetEst=wl.reduce((s,r)=>{const{effectiveRate}=estimateTaxes(parseFloat(r.rate)*2080);return s+parseFloat(r.earned)*(1-effectiveRate);},0);
   document.getElementById('wl-total-hrs').textContent=totalHrs.toFixed(1);
   document.getElementById('wl-total-earned').textContent='$'+totalEarned.toFixed(2);
+  document.getElementById('wl-total-net').textContent='~$'+totalNetEst.toFixed(2);
   document.getElementById('wl-total-shifts').textContent=wl.length;
   const wb=document.getElementById('work-log-body');
   if(wl.length===0){wb.innerHTML='<div class="empty-log">No shifts logged yet — complete a shift above to see it here.</div>';}
   else{
     wb.innerHTML='<table class="ltable"><thead><tr>'+
-      '<th style="width:10%">Date</th><th style="width:11%">In</th><th style="width:11%">Out</th>'+
-      '<th style="width:9%">Hrs</th><th style="width:9%">Rate</th><th style="width:12%">Earned</th>'+
-      '<th style="width:14%">Week</th><th style="width:7%"></th>'+
+      '<th style="width:8%">Date</th><th style="width:9%">In</th><th style="width:9%">Out</th>'+
+      '<th style="width:7%">Hrs</th><th style="width:8%">Rate</th><th style="width:10%">Gross</th>'+
+      '<th style="width:11%">Net Est.</th><th style="width:11%">Week</th><th style="width:7%"></th>'+
       '</tr></thead><tbody>'+
       wl.map((r,vi)=>{
         const ai=state.workLog.length-1-vi;
+        const{effectiveRate}=estimateTaxes(parseFloat(r.rate)*2080);
+        const netEst=parseFloat(r.earned)*(1-effectiveRate);
         return '<tr><td>'+r.date+'</td><td class="dim">'+fmt12(r.inTime)+'</td><td class="dim">'+fmt12(r.outTime)+'</td>'+
           '<td class="am">'+parseFloat(r.hrs).toFixed(2)+'h</td><td class="dim">$'+parseFloat(r.rate).toFixed(2)+'</td>'+
-          '<td class="in">$'+parseFloat(r.earned).toFixed(2)+'</td><td class="dim">'+getWeekEarned(r.dateKey,wl)+'</td>'+
+          '<td class="in">$'+parseFloat(r.earned).toFixed(2)+'</td>'+
+          '<td style="color:var(--green);font-family:\'Share Tech Mono\',monospace;font-size:11px">~$'+netEst.toFixed(2)+'</td>'+
+          '<td class="dim">'+getWeekEarned(r.dateKey,wl)+'</td>'+
           '<td><div class="log-act"><button class="log-act-btn del-btn" onclick="deleteWorkLog('+ai+')" title="Delete">×</button></div></td></tr>';
       }).join('')+'</tbody></table>';
   }
@@ -677,8 +722,22 @@ function renderLogs(){
 function renderBudget(){
   const fl=state.financeLog||[];
   const totalIncome=fl.reduce((s,r)=>s+(parseFloat(r.moneyIn)||0),0);
+  const taxes=estimateTaxes(totalIncome);
+  const netIncome=taxes.net;
   const incEl=document.getElementById('budget-total-income');
   if(incEl)incEl.textContent='$'+totalIncome.toFixed(2);
+
+  const taxSec=document.getElementById('budget-tax-section');
+  if(taxSec){
+    taxSec.style.display=totalIncome>0?'block':'none';
+    if(totalIncome>0){
+      document.getElementById('bt-fica').textContent='-$'+taxes.fica.toFixed(0);
+      document.getElementById('bt-fed').textContent='-$'+taxes.fed.toFixed(0);
+      document.getElementById('bt-wv').textContent='-$'+taxes.wv.toFixed(0);
+      document.getElementById('bt-net').textContent='$'+netIncome.toFixed(2);
+      document.getElementById('bt-rate').textContent='('+( taxes.effectiveRate*100).toFixed(1)+'% effective rate — WV est.)';
+    }
+  }
 
   const container=document.getElementById('budget-cats');if(!container)return;
 
@@ -686,15 +745,16 @@ function renderBudget(){
   container.innerHTML=BUDGET_CATS.map(cat=>{
     const spent=fl.filter(r=>r.category===cat.key).reduce((s,r)=>s+(parseFloat(r.moneyOut)||0),0);
     totalCatSpend+=spent;
-    const target=totalIncome*((cat.min+cat.max)/2);
+    const base=netIncome>0?netIncome:totalIncome;
+    const target=base*((cat.min+cat.max)/2);
     const pct=target>0?Math.min(120,Math.round((spent/target)*100)):0;
-    const isOver=totalIncome>0&&spent>totalIncome*cat.max;
+    const isOver=base>0&&spent>base*cat.max;
     const barW=Math.min(100,pct);
     const barColor=isOver?'var(--red)':cat.color;
     const pctColor=isOver?'var(--red)':pct>=80?'var(--green)':'var(--text-dim)';
     return '<div class="budget-cat">'+
       '<div class="bcat-name-wrap"><div class="bcat-name">'+cat.label+'</div><div class="bcat-range">'+cat.range+'</div></div>'+
-      '<div class="bcat-target-wrap"><div class="bcat-tlbl">Target</div><div class="bcat-tval">'+(totalIncome?'$'+Math.round(target):'—')+'</div></div>'+
+      '<div class="bcat-target-wrap"><div class="bcat-tlbl">Target</div><div class="bcat-tval">'+(base?'$'+Math.round(target):'—')+'</div></div>'+
       '<div class="bcat-bar-wrap"><div class="bcat-bar" style="width:'+barW+'%;background:'+barColor+'"></div></div>'+
       '<div class="bcat-spent-wrap"><div class="bcat-slbl">Spent</div><div class="bcat-sval" style="color:'+(spent>0?cat.color:'var(--text-dim)')+'">$'+spent.toFixed(2)+'</div></div>'+
       '<div class="bcat-pct" style="color:'+pctColor+'">'+pct+'%</div>'+
