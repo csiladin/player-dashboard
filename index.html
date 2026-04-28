@@ -171,6 +171,30 @@ td.in{color:var(--green);}td.out{color:var(--red);}td.pl{color:var(--purple-ligh
 .mbtn-cancel{background:transparent;color:var(--text-dim);border:1px solid var(--border-glow);}
 .mbtn-cancel:hover{color:var(--text);}
 .toast{position:fixed;top:18px;right:20px;font-size:10px;color:var(--green);font-family:'Share Tech Mono',monospace;opacity:0;transition:opacity .3s;pointer-events:none;letter-spacing:.15em;background:var(--surface2);border:1px solid rgba(76,175,125,.3);padding:5px 12px;border-radius:3px;}
+.budget-panel{background:var(--surface);border:1px solid var(--border);border-top:2px solid var(--green);border-radius:4px;padding:18px 20px;}
+.budget-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;}
+.budget-lbl{font-size:9px;letter-spacing:.2em;color:var(--text-dim);text-transform:uppercase;font-family:'Share Tech Mono',monospace;}
+.budget-income-row{display:flex;align-items:center;gap:8px;}
+.budget-income-row label{font-size:9px;color:var(--text-dim);letter-spacing:.08em;text-transform:uppercase;font-family:'Share Tech Mono',monospace;white-space:nowrap;}
+.budget-income-row input{background:var(--surface2);border:1px solid var(--border-glow);border-radius:3px;padding:4px 8px;color:var(--text);font-family:'Share Tech Mono',monospace;font-size:12px;width:110px;outline:none;}
+.budget-income-row input:focus{border-color:var(--green);}
+.budget-income-row button{background:var(--green);color:#000;border:none;border-radius:3px;padding:4px 11px;font-family:'Share Tech Mono',monospace;font-size:10px;cursor:pointer;letter-spacing:.08em;}
+.budget-income-row button:hover{opacity:.85;}
+.budget-cats{display:flex;flex-direction:column;gap:7px;}
+.budget-cat{display:grid;grid-template-columns:155px 75px 1fr 115px 44px;align-items:center;gap:10px;padding:9px 12px;border:1px solid var(--border);border-radius:4px;background:var(--surface2);}
+.bcat-name-wrap{display:flex;flex-direction:column;gap:2px;}
+.bcat-name{font-size:13px;font-weight:500;color:var(--text);}
+.bcat-range{font-size:9px;color:var(--text-dim);font-family:'Share Tech Mono',monospace;letter-spacing:.06em;}
+.bcat-target-wrap{display:flex;flex-direction:column;gap:1px;}
+.bcat-tlbl{font-size:9px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em;}
+.bcat-tval{font-size:13px;font-family:'Share Tech Mono',monospace;color:var(--text-dim);}
+.bcat-bar-wrap{height:6px;background:var(--border);border-radius:3px;overflow:hidden;}
+.bcat-bar{height:100%;border-radius:3px;transition:width .4s ease;}
+.bcat-alloc-wrap{display:flex;flex-direction:column;gap:2px;}
+.bcat-albl{font-size:9px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em;}
+.bcat-input{background:var(--surface);border:1px solid var(--border-glow);border-radius:3px;padding:4px 7px;color:var(--text);font-family:'Share Tech Mono',monospace;font-size:12px;outline:none;width:100%;}
+.bcat-input:focus{border-color:var(--purple);}
+.bcat-pct{font-size:11px;font-family:'Share Tech Mono',monospace;text-align:right;}
 .footer{text-align:center;margin-top:24px;font-size:10px;color:var(--text-dim);font-family:'Share Tech Mono',monospace;letter-spacing:.1em;}
 </style>
 </head>
@@ -253,6 +277,18 @@ td.in{color:var(--green);}td.out{color:var(--red);}td.pl{color:var(--purple-ligh
     <button class="dh-nav-btn" id="dh-next" onclick="debriefPageNav(1)">NEXT &#9654;</button>
   </div>
 </div>
+<div class="sdiv"><span>Budget Split</span></div>
+<div class="budget-panel">
+  <div class="budget-top">
+    <span class="budget-lbl">// INCOME SPLIT · ALLOCATE YOUR MONEY</span>
+    <div class="budget-income-row">
+      <label>Monthly Income:</label>
+      <input type="number" id="budget-income" placeholder="0.00" min="0" step="0.01"/>
+      <button onclick="saveBudgetIncome()">SET</button>
+    </div>
+  </div>
+  <div class="budget-cats" id="budget-cats"></div>
+</div>
 <div class="sdiv"><span>System Logs</span></div>
 <div class="logs-top">
   <div class="logp work-log">
@@ -313,7 +349,14 @@ const TC={big:"tag-big",med:"tag-med",sm:"tag-sm"};
 const TL={big:"BIG",med:"MED",sm:"SMALL"};
 const KEY='solo-dashboard-v3';
 const DEBRIEF_PAGE_SIZE=5;
-let state={totalXP:0,streak:0,lastDate:null,doneSets:{},shiftByDate:{},workLog:[],financeLog:[],contentLog:[],callsLog:[],debriefs:{}};
+const BUDGET_CATS=[
+  {key:'debt',     label:'Debt / Invest',     range:'40–50%', min:.40, max:.50, color:'var(--purple-light)'},
+  {key:'essentials',label:'Essentials',        range:'20–25%', min:.20, max:.25, color:'var(--amber)'},
+  {key:'business', label:'Business Growth',    range:'20%',    min:.20, max:.20, color:'var(--blue)'},
+  {key:'selfdev',  label:'Self Development',   range:'5–10%',  min:.05, max:.10, color:'var(--green)'},
+  {key:'fun',      label:'Fun',                range:'5%',     min:.05, max:.05, color:'var(--red)'},
+];
+let state={totalXP:0,streak:0,lastDate:null,doneSets:{},shiftByDate:{},workLog:[],financeLog:[],contentLog:[],callsLog:[],debriefs:{},budget:{income:0,debt:0,essentials:0,business:0,selfdev:0,fun:0}};
 let currentModal=null;
 let editIndex=null;
 let currentDebriefDate=null;
@@ -329,8 +372,9 @@ function loadState(){
   if(!state.contentLog)state.contentLog=[];
   if(!state.callsLog)state.callsLog=[];
   if(!state.debriefs)state.debriefs={};
+  if(!state.budget)state.budget={income:0,debt:0,essentials:0,business:0,selfdev:0,fun:0};
   currentDebriefDate=todayKey();
-  checkDayReset();restoreShiftUI();render();loadDebriefForDate(todayKey());
+  checkDayReset();restoreShiftUI();render();loadDebriefForDate(todayKey());renderBudget();
 }
 
 function saveState(){
@@ -718,6 +762,53 @@ function renderDebriefHistory(){
         '<td><div class="log-act"><button class="log-act-btn del-btn" onclick="event.stopPropagation();deleteDebrief(\''+key+'\')" title="Delete">×</button></div></td>'+
         '</tr>';
     }).join('')+'</tbody></table>';
+}
+
+function saveBudgetIncome(){
+  if(!state.budget)state.budget={income:0,debt:0,essentials:0,business:0,selfdev:0,fun:0};
+  state.budget.income=parseFloat(document.getElementById('budget-income').value)||0;
+  saveState();renderBudget();
+}
+
+function updateBudgetCat(key){
+  if(!state.budget)state.budget={income:0,debt:0,essentials:0,business:0,selfdev:0,fun:0};
+  state.budget[key]=parseFloat(document.getElementById('ba-'+key).value)||0;
+  saveState();
+  const income=state.budget.income||0;if(!income)return;
+  const cat=BUDGET_CATS.find(c=>c.key===key);if(!cat)return;
+  const target=income*((cat.min+cat.max)/2);
+  const actual=state.budget[key];
+  const pct=target>0?Math.min(120,Math.round((actual/target)*100)):0;
+  const isOver=actual>income*cat.max;
+  const barEl=document.getElementById('bb-'+key);
+  const pctEl=document.getElementById('bp-'+key);
+  if(barEl){barEl.style.width=Math.min(100,pct)+'%';barEl.style.background=isOver?'var(--red)':cat.color;}
+  if(pctEl){pctEl.textContent=pct+'%';pctEl.style.color=isOver?'var(--red)':pct>=80?'var(--green)':'var(--text-dim)';}
+}
+
+function renderBudget(){
+  if(!state.budget)state.budget={income:0,debt:0,essentials:0,business:0,selfdev:0,fun:0};
+  const income=state.budget.income||0;
+  const incEl=document.getElementById('budget-income');
+  if(incEl&&incEl!==document.activeElement)incEl.value=income||'';
+  const container=document.getElementById('budget-cats');if(!container)return;
+  container.innerHTML=BUDGET_CATS.map(cat=>{
+    const target=income*((cat.min+cat.max)/2);
+    const actual=state.budget[cat.key]||0;
+    const pct=target>0?Math.min(120,Math.round((actual/target)*100)):0;
+    const isOver=income>0&&actual>income*cat.max;
+    const barW=Math.min(100,pct);
+    const barColor=isOver?'var(--red)':cat.color;
+    const pctColor=isOver?'var(--red)':pct>=80?'var(--green)':'var(--text-dim)';
+    return '<div class="budget-cat">'+
+      '<div class="bcat-name-wrap"><div class="bcat-name">'+cat.label+'</div><div class="bcat-range">'+cat.range+'</div></div>'+
+      '<div class="bcat-target-wrap"><div class="bcat-tlbl">Target</div><div class="bcat-tval">'+(income?'$'+Math.round(target):'—')+'</div></div>'+
+      '<div class="bcat-bar-wrap"><div class="bcat-bar" id="bb-'+cat.key+'" style="width:'+barW+'%;background:'+barColor+'"></div></div>'+
+      '<div class="bcat-alloc-wrap"><div class="bcat-albl">Allocated</div>'+
+      '<input class="bcat-input" id="ba-'+cat.key+'" type="number" min="0" step="0.01" value="'+(actual||'')+'" placeholder="0.00" oninput="updateBudgetCat(\''+cat.key+'\')"/></div>'+
+      '<div class="bcat-pct" id="bp-'+cat.key+'" style="color:'+pctColor+'">'+pct+'%</div>'+
+      '</div>';
+  }).join('');
 }
 
 function openModal(type,editIdx){
